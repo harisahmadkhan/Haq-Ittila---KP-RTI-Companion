@@ -21,7 +21,7 @@ A submission guide then shows the PIO contact, address, email, the filing deadli
 
 ## Demo Mode
 
-The app ships with **16 pre-baked example queries** covering all 9 KP department categories (2 per category). Selecting any example query runs a full end-to-end demo — research panel, department routing, bilingual RTI draft — with zero API calls and zero cost.
+The app ships with **16 pre-baked example queries** covering all 9 KP department categories. Selecting any example query runs a full end-to-end flow — research panel, department routing, bilingual RTI draft — with zero API calls.
 
 | Category | Example queries |
 |---|---|
@@ -35,43 +35,7 @@ The app ships with **16 pre-baked example queries** covering all 9 KP department
 | Police | Police station upgrades · Merit-based recruitment records |
 | Forestry | Billion Tree Tsunami verified coverage |
 
-For custom queries typed by the user, the app calls the live Anthropic API (requires `VITE_ANTHROPIC_API_KEY`).
-
----
-
-## How to run locally
-
-**Prerequisites:** Node.js 18+
-
-```bash
-git clone https://github.com/harisahmadkhan/Haq-Ittila---KP-RTI-Companion.git
-cd Haq-Ittila---KP-RTI-Companion
-npm install
-```
-
-**Demo mode (no API key needed):** The 16 example queries work entirely from local data. Just run:
-
-```bash
-npm run dev
-```
-
-**Live AI mode (custom queries):** Create a `.env.local` file:
-
-```
-VITE_ANTHROPIC_API_KEY=your_key_here
-```
-
-Then `npm run dev` and open `http://localhost:5173`.
-
----
-
-## Deploying to Vercel
-
-1. Connect the GitHub repo in your Vercel dashboard
-2. Set `VITE_ANTHROPIC_API_KEY` under **Settings → Environment Variables**
-3. Deploy — the build command is `npm run build`, output directory is `dist`
-
-> **Note:** The Anthropic API is called directly from the browser using the `anthropic-dangerous-direct-browser-calls` header. For production, wrap calls in a Vercel Edge Function to keep the API key server-side.
+For custom queries, the app calls the Anthropic API (requires `VITE_ANTHROPIC_API_KEY` in `.env.local`).
 
 ---
 
@@ -85,7 +49,6 @@ Then `npm run dev` and open `http://localhost:5173`.
 | AI | Anthropic `claude-sonnet-4-6` with web search tool |
 | Fonts | Open Sans · EB Garamond · Gulzar (Urdu Nastaliq) — Google Fonts |
 | State | React `useReducer` — no external library |
-| Routing | Single-page wizard — no React Router |
 | Backend | None — frontend-only |
 | Deployment | Vercel |
 
@@ -95,25 +58,39 @@ Then `npm run dev` and open `http://localhost:5173`.
 
 ```
 src/
-├── data/
-│   ├── manifestos.js          ← 20 KP manifesto chunks (PTI, ANP, JUI-F)
-│   ├── departments.js         ← 10 KP departments with PIO info
-│   ├── kp-rti-act.js          ← Key KP RTI Act 2013 provisions
-│   └── demo-responses.js      ← 16 pre-baked demo responses (EN + UR)
-├── lib/
-│   ├── claude.js              ← Anthropic API wrapper + extractJSON utility
-│   ├── prompts.js             ← All system prompts (research, routing, draft)
-│   └── manifesto-search.js    ← Keyword matching with stopword filter
+├── App.jsx                          ← Wizard orchestration, step routing
+├── main.jsx
 ├── components/
-│   ├── layout/                ← Header (gradient + KP emblem), StepIndicator
-│   ├── steps/                 ← QueryInput, ResearchPanel, RoutingConfirm,
-│   │                              RTIDraft, SubmissionGuide
-│   └── ui/                    ← Button, Card, Badge, StatusTag, Spinner, UrduText
+│   ├── layout/
+│   │   ├── Header.jsx               ← Gradient header with KP emblem SVG
+│   │   └── StepIndicator.jsx        ← 5-step progress bar
+│   ├── steps/
+│   │   ├── QueryInput.jsx           ← Step 1 — hero banner + 16-query category grid
+│   │   ├── ResearchPanel.jsx        ← Step 2 — manifesto refs + research panels
+│   │   ├── RoutingConfirm.jsx       ← Step 3 — department card + override dropdown
+│   │   ├── RTIDraft.jsx             ← Step 4 — side-by-side EN/UR editable drafts
+│   │   └── SubmissionGuide.jsx      ← Step 5 — PIO contact, deadline, escalation
+│   └── ui/
+│       ├── Button.jsx
+│       ├── Badge.jsx
+│       ├── Card.jsx
+│       ├── Spinner.jsx
+│       ├── StatusTag.jsx
+│       └── UrduText.jsx             ← RTL wrapper for Urdu blocks
+├── data/
+│   ├── manifestos.js                ← 20 manifesto chunks (PTI 8, ANP 5, JUI-F 5)
+│   ├── departments.js               ← 10 KP departments with PIO info and addresses
+│   ├── kp-rti-act.js                ← Key KP RTI Act 2013 provisions as constants
+│   └── demo-responses.js            ← 16 full pre-baked responses (EN + UR drafts)
+├── lib/
+│   ├── claude.js                    ← Anthropic API wrapper + extractJSON utility
+│   ├── prompts.js                   ← System prompts: RESEARCH, ROUTING, RTI_DRAFT
+│   └── manifesto-search.js          ← Keyword matching with stopword filter
 ├── hooks/
-│   └── useWizard.js           ← 5-step wizard state (useReducer)
+│   └── useWizard.js                 ← useReducer wizard state (GO_TO_STEP, UPDATE, RESET)
 └── styles/
-    ├── globals.css             ← Tailwind v4 @theme, Nizam tokens, print CSS
-    └── rtl.css                 ← RTL utilities
+    ├── globals.css                  ← Tailwind v4 @theme, Nizam tokens, print CSS
+    └── rtl.css                      ← RTL utilities
 ```
 
 ---
