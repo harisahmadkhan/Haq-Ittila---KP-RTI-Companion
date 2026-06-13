@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Gulzar';
+  src: url('/fonts/Gulzar-Regular.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Nafees';
+  src: url('/fonts/Gulzar-Regular.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@theme {
+  /* Nizam green scale */
+  --color-nizam_green-50:  #E5F7EE;
+  --color-nizam_green-100: #B6E7CB;
+  --color-nizam_green-200: #80D5A3;
+  --color-nizam_green-300: #55C885;
+  --color-nizam_green-400: #2BBA67;
+  --color-nizam_green-500: #00AC48;
+  --color-nizam_green-600: #008F3C;
+  --color-nizam_green-700: #007330;
+  --color-nizam_green-800: #005126;
+  --color-nizam_green-900: #01411C;
+  --color-nizam_green-950: #002812;
+
+  /* Semantic Nizam tokens — defined as CSS vars so components stay token-only */
+  --color-primary:        rgb(0 172 72);
+  --color-primary_accent: rgb(229 247 238);
+  --color-secondary:      rgb(26 26 46);
+  --color-foreground:     rgb(26 26 46);
+  --color-background:     rgb(245 243 238);
+  --color-surface:        rgb(255 255 255);
+  --color-muted:          rgb(154 149 144);
+  --color-success:        rgb(16 185 129);
+  --color-success_accent: rgb(209 250 229);
+  --color-danger:         rgb(239 68 68);
+  --color-danger_accent:  rgb(254 226 226);
+  --color-warning:        rgb(245 158 11);
+  --color-warning_accent: rgb(254 243 199);
+
+  /* Font families */
+  --font-sans:     "Open Sans", system-ui, sans-serif;
+  --font-serif:    "EB Garamond", Georgia, serif;
+  --font-nastaliq: "Gulzar", serif;
+  --font-naskh:    "Nafees", serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Print styles — hide everything except the RTI draft content */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

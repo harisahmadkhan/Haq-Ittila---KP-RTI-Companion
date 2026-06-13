@@ -1,0 +1,10 @@
+/* RTL column wrapper — applied only to explicit Urdu column containers */
+.urdu-col {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Ensure Latin siblings in flex rows are not affected by RTL */
+.urdu-col * {
+  unicode-bidi: isolate;
+}
