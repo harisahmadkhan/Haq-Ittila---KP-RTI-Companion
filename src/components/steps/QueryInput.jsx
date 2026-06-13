@@ -2,13 +2,68 @@ import { useState } from 'react';
 import Button from '../ui/Button.jsx';
 import Card from '../ui/Card.jsx';
 
-const EXAMPLE_QUERIES = [
-  'Has the government built the promised schools in Swat district?',
-  'Why is the Peshawar BRT budget unaccounted for?',
-  'What happened to the funds allocated for Charsadda flood relief?',
-  'How many doctors were hired for rural health centres in 2024?',
-  'What is the status of police station upgrades under KP Police Act 2017?',
-  'Why is clean drinking water still not available in Kohistan villages?',
+const EXAMPLE_CATEGORIES = [
+  {
+    label: 'Education',
+    queries: [
+      'Has the government built the promised schools in Swat district?',
+      'How many ghost schools were closed or merged in KP since 2022?',
+    ],
+  },
+  {
+    label: 'Health',
+    queries: [
+      'How many doctors were hired for rural health centres in 2024?',
+      'Are Sehat Sahulat health cards active and functional in all KP districts?',
+    ],
+  },
+  {
+    label: 'Infrastructure',
+    queries: [
+      'Why is the Peshawar BRT budget unaccounted for?',
+      'What is the progress and total expenditure on the DI Khan to Peshawar Motorway?',
+    ],
+  },
+  {
+    label: 'Agriculture',
+    queries: [
+      'How many KP farmers received the promised subsidised fertiliser in 2024?',
+      'What is the status of the KP agricultural land records digitisation programme?',
+    ],
+  },
+  {
+    label: 'Energy',
+    queries: [
+      'Why are KP hydropower projects delayed and where has the allocated budget gone?',
+      'What percentage of merged district villages have been electrified since 2021?',
+    ],
+  },
+  {
+    label: 'Water & Sanitation',
+    queries: [
+      'Why is clean drinking water still not available in Kohistan villages?',
+    ],
+  },
+  {
+    label: 'Local Government',
+    queries: [
+      'What happened to the funds allocated for Charsadda flood relief?',
+      'When will KP hold local body elections and what is the legal basis for the delay?',
+    ],
+  },
+  {
+    label: 'Police',
+    queries: [
+      'What is the status of police station upgrades under KP Police Act 2017?',
+      'How many police officers were recruited on merit in KP in 2023 and 2024?',
+    ],
+  },
+  {
+    label: 'Forestry',
+    queries: [
+      'What is the current status and verified area coverage of the Billion Tree Tsunami in KP?',
+    ],
+  },
 ];
 
 export default function QueryInput({ onSubmit }) {
@@ -45,16 +100,23 @@ export default function QueryInput({ onSubmit }) {
         </div>
 
         <div className="mb-5">
-          <p className="text-xs text-muted font-sans mb-3 uppercase tracking-wide font-semibold">Example questions</p>
-          <div className="flex flex-wrap gap-2">
-            {EXAMPLE_QUERIES.map(q => (
-              <button
-                key={q}
-                onClick={() => setQuery(q)}
-                className="text-xs font-sans bg-primary_accent text-primary rounded-full px-3 py-1.5 hover:bg-nizam_green-100 transition-colors text-left"
-              >
-                {q}
-              </button>
+          <p className="text-xs text-muted font-sans mb-3 uppercase tracking-wide font-semibold">Example questions by category</p>
+          <div className="flex flex-col gap-3">
+            {EXAMPLE_CATEGORIES.map(cat => (
+              <div key={cat.label}>
+                <p className="text-xs font-sans font-semibold text-muted mb-1.5">{cat.label}</p>
+                <div className="flex flex-wrap gap-2">
+                  {cat.queries.map(q => (
+                    <button
+                      key={q}
+                      onClick={() => setQuery(q)}
+                      className="text-xs font-sans bg-primary_accent text-primary rounded-full px-3 py-1.5 hover:bg-nizam_green-100 transition-colors text-left"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
