@@ -11,7 +11,7 @@ export default function App() {
   const { state, goToStep, updateState, resetWizard } = useWizard();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-nizam_green-50 to-background">
       <Header />
       <StepIndicator currentStep={state.step} />
 

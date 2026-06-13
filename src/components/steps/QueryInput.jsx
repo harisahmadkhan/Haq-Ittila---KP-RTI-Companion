@@ -74,53 +74,37 @@ export default function QueryInput({ onSubmit }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="text-center mb-8">
-        <h2 className="font-sans font-bold text-2xl text-foreground mb-2">
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      {/* Gradient hero banner */}
+      <div className="bg-gradient-to-br from-nizam_green-700 via-nizam_green-600 to-nizam_green-400 rounded-2xl px-8 py-10 text-center mb-8 shadow-xl relative overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white/5 translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+
+        <p className="font-naskh text-white/70 text-lg mb-1">حق اطلاع</p>
+        <h2 className="font-sans font-bold text-2xl md:text-3xl text-white mb-3 relative">
           What do you want to know from the KP government?
         </h2>
-        <p className="text-muted font-sans text-sm">
-          Type your question in English or Urdu — we'll research promises, find the right department, and draft a legal RTI request for you.
+        <p className="text-white/75 font-sans text-sm max-w-xl mx-auto relative">
+          Describe your question in plain language — we'll research manifestos and news, identify the right department, and draft a legally sound RTI request in English and Urdu.
         </p>
       </div>
 
-      <Card>
+      {/* Input card */}
+      <Card className="mb-8">
         <textarea
-          className="w-full h-36 font-sans text-foreground bg-background rounded-lg border border-gray-200 p-4 resize-none focus:outline-none focus:ring-2 focus:ring-nizam_green-400 placeholder:text-muted"
+          className="w-full h-32 font-sans text-foreground bg-background rounded-lg border border-gray-200 p-4 resize-none focus:outline-none focus:ring-2 focus:ring-nizam_green-400 placeholder:text-muted"
           placeholder="e.g. Has the government built the promised schools in Swat? / کیا حکومت نے سوات میں وعدہ کیے گئے اسکول تعمیر کیے؟"
           value={query}
           onChange={e => setQuery(e.target.value)}
           maxLength={500}
         />
-        <div className="flex items-center justify-between mt-2 mb-5">
+        <div className="flex items-center justify-between mt-2 mb-4">
           <span className="text-xs text-muted font-sans">{query.length}/500</span>
           {query.length > 0 && query.length < 20 && (
             <span className="text-xs text-warning font-sans">Please enter at least 20 characters</span>
           )}
         </div>
-
-        <div className="mb-5">
-          <p className="text-xs text-muted font-sans mb-3 uppercase tracking-wide font-semibold">Example questions by category</p>
-          <div className="flex flex-col gap-3">
-            {EXAMPLE_CATEGORIES.map(cat => (
-              <div key={cat.label}>
-                <p className="text-xs font-sans font-semibold text-muted mb-1.5">{cat.label}</p>
-                <div className="flex flex-wrap gap-2">
-                  {cat.queries.map(q => (
-                    <button
-                      key={q}
-                      onClick={() => setQuery(q)}
-                      className="text-xs font-sans bg-primary_accent text-primary rounded-full px-3 py-1.5 hover:bg-nizam_green-100 transition-colors text-left"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <Button
           onClick={handleSubmit}
           disabled={query.trim().length < 20}
@@ -129,6 +113,33 @@ export default function QueryInput({ onSubmit }) {
           Research this →
         </Button>
       </Card>
+
+      {/* Category grid */}
+      <div className="mb-3">
+        <p className="text-xs text-muted font-sans mb-4 uppercase tracking-wider font-semibold text-center">
+          Or pick an example question by category
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {EXAMPLE_CATEGORIES.map(cat => (
+            <div key={cat.label} className="bg-surface rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="bg-gradient-to-r from-nizam_green-700 to-nizam_green-500 px-4 py-2.5">
+                <p className="text-xs font-sans font-bold text-white uppercase tracking-wider">{cat.label}</p>
+              </div>
+              <div className="p-3 flex flex-col gap-2">
+                {cat.queries.map(q => (
+                  <button
+                    key={q}
+                    onClick={() => setQuery(q)}
+                    className="w-full text-left text-xs font-sans text-primary bg-primary_accent rounded-lg px-3 py-2 hover:bg-nizam_green-200 hover:text-nizam_green-800 transition-colors leading-snug"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
