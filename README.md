@@ -3,7 +3,7 @@
 
 A civic accountability tool that helps citizens of Khyber Pakhtunkhwa draft legally sound RTI requests under the **KP Right to Information Act 2013**.
 
-Built for the **AI for Civic Innovation Hackathon 2026** (Code for Pakistan / FAST NUCES / Grey Software / Scrimba).
+**Live:** https://haq-ittila-kp-rti-companion.vercel.app
 
 ---
 
@@ -126,10 +126,6 @@ src/
 
 ---
 
-## Hackathon submission
+## Built by
 
-- **Event:** AI for Civic Innovation Hackathon 2026
-- **Organisers:** Code for Pakistan · FAST NUCES · Grey Software · Scrimba
-- **Submitted by:** Haris Ahmad Khan
-- **Live URL:** *(Vercel deployment URL)*
-- **Devpost:** *(submission link)*
+Haris Ahmad Khan
