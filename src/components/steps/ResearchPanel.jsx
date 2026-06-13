@@ -3,9 +3,8 @@ import Button from '../ui/Button.jsx';
 import Card from '../ui/Card.jsx';
 import Badge from '../ui/Badge.jsx';
 import Spinner from '../ui/Spinner.jsx';
-import { callClaudeWithSearch } from '../../lib/claude.js';
 import { findRelevantChunks } from '../../lib/manifesto-search.js';
-import { RESEARCH_PROMPT } from '../../lib/prompts.js';
+import { DEMO_RESPONSES } from '../../data/demo-responses.js';
 
 function parseResearchSections(text) {
   const extract = (label) => {
@@ -14,46 +13,48 @@ function parseResearchSections(text) {
     return m ? m[1].trim() : '';
   };
   return {
-    promises:      extract('PROMISES FOUND'),
-    webFindings:   extract('WEB FINDINGS'),
+    promises:          extract('PROMISES FOUND'),
+    webFindings:       extract('WEB FINDINGS'),
     accountabilityGap: extract('ACCOUNTABILITY GAP'),
-    rtiRelevance:  extract('RTI RELEVANCE'),
+    rtiRelevance:      extract('RTI RELEVANCE'),
   };
 }
 
 export default function ResearchPanel({ query, onProceed, onRevise, onResearchDone }) {
   const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
   const [sections, setSections] = useState(null);
   const [chunks, setChunks]     = useState([]);
+  const [isDemo, setIsDemo]     = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+
     async function run() {
       setLoading(true);
-      setError(null);
-      try {
-        const matched = findRelevantChunks(query);
+
+      // Small artificial delay so the loading state is visible and the demo feels real
+      await new Promise(r => setTimeout(r, 900));
+      if (cancelled) return;
+
+      const demo = DEMO_RESPONSES[query];
+      const matched = findRelevantChunks(query);
+
+      if (demo) {
+        setIsDemo(true);
         setChunks(matched);
-
-        const manifestoContext = matched.length > 0
-          ? matched.map(c => `[${c.party} — ${c.topic} — ${c.source}]\n${c.text}`).join('\n\n')
-          : 'No matching manifesto promises found for this query.';
-
-        const userMessage = `Civic question: "${query}"\n\nRelevant manifesto excerpts:\n${manifestoContext}`;
-        const raw = await callClaudeWithSearch({ system: RESEARCH_PROMPT, userMessage, maxTokens: 2000 });
-
-        if (!cancelled) {
-          const parsed = parseResearchSections(raw);
-          setSections(parsed);
-          onResearchDone({ researchSummary: raw, manifestoChunks: matched });
-        }
-      } catch (e) {
-        if (!cancelled) setError(e.message);
-      } finally {
-        if (!cancelled) setLoading(false);
+        setSections(parseResearchSections(demo.research));
+        onResearchDone({ researchSummary: demo.research, manifestoChunks: matched });
+      } else {
+        // Non-demo query — show a friendly notice, still allow proceeding
+        setIsDemo(false);
+        setChunks(matched);
+        setSections(null);
+        onResearchDone({ researchSummary: '', manifestoChunks: matched });
       }
+
+      setLoading(false);
     }
+
     run();
     return () => { cancelled = true; };
   }, [query]);
@@ -67,15 +68,6 @@ export default function ResearchPanel({ query, onProceed, onRevise, onResearchDo
     );
   }
 
-  if (error) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-10 text-center">
-        <p className="text-danger font-sans mb-4">Research failed: {error}</p>
-        <Button variant="secondary" onClick={onRevise}>← Try again</Button>
-      </div>
-    );
-  }
-
   const hasContent = sections && (sections.promises || sections.webFindings);
 
   return (
@@ -83,9 +75,11 @@ export default function ResearchPanel({ query, onProceed, onRevise, onResearchDo
       <h2 className="font-sans font-bold text-xl text-foreground mb-1">Research Results</h2>
       <p className="text-sm text-muted font-sans mb-6">Query: <em>{query}</em></p>
 
-      {!hasContent && (
-        <Card className="mb-6 text-center">
-          <p className="font-sans text-muted">No manifesto promises or recent news found for this query. You can still draft a general RTI request.</p>
+      {!isDemo && (
+        <Card className="mb-6 border-warning bg-warning_accent">
+          <p className="font-sans text-sm text-foreground">
+            <span className="font-semibold">Demo mode:</span> Live research is available for the example queries. Select one of the example questions on the previous screen to see a full research report — or continue to draft a general RTI request for this custom query.
+          </p>
         </Card>
       )}
 
@@ -97,22 +91,24 @@ export default function ResearchPanel({ query, onProceed, onRevise, onResearchDo
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-nizam_green-50 rounded-xl border border-nizam_green-100 p-5">
-          <h3 className="font-sans font-semibold text-nizam_green-800 text-sm uppercase tracking-wide mb-3">Promises Found</h3>
-          <p className="font-sans text-sm text-foreground whitespace-pre-wrap">{sections?.promises || 'No specific promises found.'}</p>
-        </div>
+      {hasContent && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-nizam_green-50 rounded-xl border border-nizam_green-100 p-5">
+            <h3 className="font-sans font-semibold text-nizam_green-800 text-sm uppercase tracking-wide mb-3">Promises Found</h3>
+            <p className="font-sans text-sm text-foreground whitespace-pre-wrap">{sections.promises || 'No specific promises found.'}</p>
+          </div>
 
-        <div className="bg-surface rounded-xl border border-gray-200 p-5 shadow-sm">
-          <h3 className="font-sans font-semibold text-foreground text-sm uppercase tracking-wide mb-3">Web Findings</h3>
-          <p className="font-sans text-sm text-foreground whitespace-pre-wrap">{sections?.webFindings || 'No relevant news found.'}</p>
-        </div>
+          <div className="bg-surface rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h3 className="font-sans font-semibold text-foreground text-sm uppercase tracking-wide mb-3">Web Findings</h3>
+            <p className="font-sans text-sm text-foreground whitespace-pre-wrap">{sections.webFindings || 'No relevant news found.'}</p>
+          </div>
 
-        <div className="bg-warning_accent rounded-xl border border-yellow-200 p-5">
-          <h3 className="font-sans font-semibold text-warning text-sm uppercase tracking-wide mb-3">Accountability Gap</h3>
-          <p className="font-sans text-sm text-foreground whitespace-pre-wrap">{sections?.accountabilityGap || 'No gap information available.'}</p>
+          <div className="bg-warning_accent rounded-xl border border-yellow-200 p-5">
+            <h3 className="font-sans font-semibold text-warning text-sm uppercase tracking-wide mb-3">Accountability Gap</h3>
+            <p className="font-sans text-sm text-foreground whitespace-pre-wrap">{sections.accountabilityGap || 'No gap information available.'}</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {sections?.rtiRelevance && (
         <Card className="mb-6 bg-primary_accent border-nizam_green-100">

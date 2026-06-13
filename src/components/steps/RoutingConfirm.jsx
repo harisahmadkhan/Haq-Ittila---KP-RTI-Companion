@@ -6,6 +6,7 @@ import Spinner from '../ui/Spinner.jsx';
 import { callClaude, extractJSON } from '../../lib/claude.js';
 import { ROUTING_PROMPT } from '../../lib/prompts.js';
 import { KP_DEPARTMENTS } from '../../data/departments.js';
+import { DEMO_RESPONSES } from '../../data/demo-responses.js';
 
 const DEPT_KEYS = Object.keys(KP_DEPARTMENTS);
 
@@ -22,9 +23,14 @@ export default function RoutingConfirm({ query, researchSummary, onConfirm, onBa
       setLoading(true);
       setError(null);
       try {
-        const userMessage = `Civic question: "${query}"\n\nResearch summary:\n${researchSummary}`;
-        const raw = await callClaude({ system: ROUTING_PROMPT, userMessage, maxTokens: 600 });
-        const parsed = extractJSON(raw);
+        await new Promise(r => setTimeout(r, 700));
+        if (cancelled) return;
+
+        const demo = DEMO_RESPONSES[query];
+        const parsed = demo
+          ? demo.routing
+          : extractJSON(await callClaude({ system: ROUTING_PROMPT, userMessage: `Civic question: "${query}"\n\nResearch summary:\n${researchSummary}`, maxTokens: 600 }));
+
         if (!cancelled) {
           setRouting(parsed);
           setSelected(parsed.department_key);

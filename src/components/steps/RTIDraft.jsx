@@ -5,6 +5,7 @@ import Spinner from '../ui/Spinner.jsx';
 import UrduText from '../ui/UrduText.jsx';
 import { callClaude, extractJSON } from '../../lib/claude.js';
 import { RTI_DRAFT_PROMPT } from '../../lib/prompts.js';
+import { DEMO_RESPONSES } from '../../data/demo-responses.js';
 
 export default function RTIDraft({ query, researchSummary, department, routingReason, onDraftDone, onNext, onBack }) {
   const [loading, setLoading] = useState(true);
@@ -20,15 +21,22 @@ export default function RTIDraft({ query, researchSummary, department, routingRe
       setLoading(true);
       setError(null);
       try {
-        const userMessage = [
-          `Civic question: "${query}"`,
-          `Research summary:\n${researchSummary}`,
-          `Identified department: ${department.name}`,
-          `Routing reason: ${routingReason}`,
-        ].join('\n\n');
+        await new Promise(r => setTimeout(r, 800));
+        if (cancelled) return;
 
-        const raw = await callClaude({ system: RTI_DRAFT_PROMPT, userMessage, maxTokens: 2000 });
-        const parsed = extractJSON(raw);
+        const demo = DEMO_RESPONSES[query];
+        const parsed = demo
+          ? demo.draft
+          : extractJSON(await callClaude({
+              system: RTI_DRAFT_PROMPT,
+              userMessage: [
+                `Civic question: "${query}"`,
+                `Research summary:\n${researchSummary}`,
+                `Identified department: ${department.name}`,
+                `Routing reason: ${routingReason}`,
+              ].join('\n\n'),
+              maxTokens: 2000,
+            }));
         if (!cancelled) {
           setDraft(parsed);
           setBodyEn(parsed.body_en || '');
