@@ -3,10 +3,10 @@ import Button from '../ui/Button.jsx';
 import Card from '../ui/Card.jsx';
 import Spinner from '../ui/Spinner.jsx';
 import UrduText from '../ui/UrduText.jsx';
-import { callClaude } from '../../lib/claude.js';
+import { callClaude, extractJSON } from '../../lib/claude.js';
 import { RTI_DRAFT_PROMPT } from '../../lib/prompts.js';
 
-export default function RTIDraft({ query, researchSummary, department, routingReason, onDraftDone, onNext }) {
+export default function RTIDraft({ query, researchSummary, department, routingReason, onDraftDone, onNext, onBack }) {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
   const [draft, setDraft]     = useState(null);
@@ -28,7 +28,7 @@ export default function RTIDraft({ query, researchSummary, department, routingRe
         ].join('\n\n');
 
         const raw = await callClaude({ system: RTI_DRAFT_PROMPT, userMessage, maxTokens: 2000 });
-        const parsed = JSON.parse(raw);
+        const parsed = extractJSON(raw);
         if (!cancelled) {
           setDraft(parsed);
           setBodyEn(parsed.body_en || '');
@@ -71,6 +71,7 @@ export default function RTIDraft({ query, researchSummary, department, routingRe
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 text-center">
         <p className="text-danger font-sans mb-4">Draft generation failed: {error}</p>
+        <Button variant="secondary" onClick={onBack}>← Go back</Button>
       </div>
     );
   }

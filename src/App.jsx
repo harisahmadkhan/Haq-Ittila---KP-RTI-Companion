@@ -53,6 +53,7 @@ export default function App() {
             department={state.department}
             routingReason={state.routingReason}
             onDraftDone={(data) => updateState(data)}
+            onBack={() => goToStep(3)}
             onNext={() => {
               updateState({ filedDate: new Date().toISOString() });
               goToStep(5);

@@ -19,9 +19,18 @@ export async function callClaude({ system, userMessage, maxTokens = 1000 }) {
       messages: [{ role: 'user', content: userMessage }],
     }),
   });
-  if (!res.ok) throw new Error(`API error ${res.status}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error ${res.status}`);
+  }
   const data = await res.json();
   return data.content[0].text;
+}
+
+// Strips markdown code fences Claude sometimes wraps JSON in
+export function extractJSON(text) {
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  return JSON.parse(fenced ? fenced[1].trim() : text.trim());
 }
 
 export async function callClaudeWithSearch({ system, userMessage, maxTokens = 2000 }) {

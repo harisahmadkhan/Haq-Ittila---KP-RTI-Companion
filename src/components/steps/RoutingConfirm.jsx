@@ -3,7 +3,7 @@ import Button from '../ui/Button.jsx';
 import Card from '../ui/Card.jsx';
 import StatusTag from '../ui/StatusTag.jsx';
 import Spinner from '../ui/Spinner.jsx';
-import { callClaude } from '../../lib/claude.js';
+import { callClaude, extractJSON } from '../../lib/claude.js';
 import { ROUTING_PROMPT } from '../../lib/prompts.js';
 import { KP_DEPARTMENTS } from '../../data/departments.js';
 
@@ -24,7 +24,7 @@ export default function RoutingConfirm({ query, researchSummary, onConfirm, onBa
       try {
         const userMessage = `Civic question: "${query}"\n\nResearch summary:\n${researchSummary}`;
         const raw = await callClaude({ system: ROUTING_PROMPT, userMessage, maxTokens: 600 });
-        const parsed = JSON.parse(raw);
+        const parsed = extractJSON(raw);
         if (!cancelled) {
           setRouting(parsed);
           setSelected(parsed.department_key);
