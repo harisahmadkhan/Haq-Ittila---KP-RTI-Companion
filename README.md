@@ -9,13 +9,39 @@ Built for the **AI for Civic Innovation Hackathon 2026** (Code for Pakistan / FA
 
 ## What it does
 
-1. **Research** — searches KP party manifestos (PTI, ANP, JUI-F) and the web for promises and accountability gaps related to your question
-2. **Route** — identifies the correct KP provincial department and its Public Information Officer
-3. **Draft** — generates a formal RTI request in both English and Urdu, citing the KP RTI Act 2013
+A citizen describes what they want to know from the KP government in plain English or Urdu. The tool does three things:
+
+1. **Research** — searches KP party manifestos (PTI, ANP, JUI-F) for relevant promises, and uses web search to surface recent news, audit reports, and official statements. Returns a structured breakdown: Promises Found / Web Findings / Accountability Gap / RTI Relevance.
+2. **Route** — identifies the correct KP provincial department and its Public Information Officer under the KP RTI Act 2013. The citizen can confirm or override the suggestion.
+3. **Draft** — generates a formal RTI request in both **English and Urdu (Nastaliq script, right-to-left)**, citing KP RTI Act 2013 sections 4 and 7, the 14 working-day deadline, and the KP Information Commission as the escalation body. Both drafts are editable before the citizen submits.
+
+A submission guide then shows the PIO contact, address, email, the filing deadline date, and the escalation path if no response arrives.
+
+---
+
+## Demo Mode
+
+The app ships with **16 pre-baked example queries** covering all 9 KP department categories (2 per category). Selecting any example query runs a full end-to-end demo — research panel, department routing, bilingual RTI draft — with zero API calls and zero cost.
+
+| Category | Example queries |
+|---|---|
+| Education | School construction in Swat · Ghost school closures since 2022 |
+| Health | Rural health centre doctors · Sehat Sahulat card functionality |
+| Infrastructure | Peshawar BRT budget · DI Khan–Peshawar Motorway expenditure |
+| Agriculture | Subsidised fertiliser beneficiaries · Land records digitisation |
+| Energy | Hydropower project delays · Merged district village electrification |
+| Water & Sanitation | Clean drinking water in Kohistan |
+| Local Government | Charsadda flood relief funds · Local body elections delay |
+| Police | Police station upgrades · Merit-based recruitment records |
+| Forestry | Billion Tree Tsunami verified coverage |
+
+For custom queries typed by the user, the app calls the live Anthropic API (requires `VITE_ANTHROPIC_API_KEY`).
+
+---
 
 ## How to run locally
 
-**Prerequisites:** Node.js 18+, an Anthropic API key
+**Prerequisites:** Node.js 18+
 
 ```bash
 git clone https://github.com/harisahmadkhan/Haq-Ittila---KP-RTI-Companion.git
@@ -23,31 +49,87 @@ cd Haq-Ittila---KP-RTI-Companion
 npm install
 ```
 
-Create a `.env.local` file in the project root:
-
-```
-VITE_ANTHROPIC_API_KEY=your_key_here
-```
-
-Then start the dev server:
+**Demo mode (no API key needed):** The 16 example queries work entirely from local data. Just run:
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+**Live AI mode (custom queries):** Create a `.env.local` file:
 
-## Setting the API key on Vercel
+```
+VITE_ANTHROPIC_API_KEY=your_key_here
+```
 
-In your Vercel project: **Settings → Environment Variables** → add `VITE_ANTHROPIC_API_KEY`.
+Then `npm run dev` and open `http://localhost:5173`.
+
+---
+
+## Deploying to Vercel
+
+1. Connect the GitHub repo in your Vercel dashboard
+2. Set `VITE_ANTHROPIC_API_KEY` under **Settings → Environment Variables**
+3. Deploy — the build command is `npm run build`, output directory is `dist`
+
+> **Note:** The Anthropic API is called directly from the browser using the `anthropic-dangerous-direct-browser-calls` header. For production, wrap calls in a Vercel Edge Function to keep the API key server-side.
+
+---
 
 ## Tech stack
 
-- React 18 + Vite 8
-- Tailwind CSS v4 (Digital Design Nizam tokens)
-- Anthropic Claude API (`claude-sonnet-4-6`) with web search tool
-- Frontend-only — no backend, no database
+| Layer | Choice |
+|---|---|
+| Framework | React 18 + Vite |
+| Styling | Tailwind CSS v4 — CSS-first `@theme` config via `@tailwindcss/vite` |
+| Design system | Digital Design Nizam (Code for Pakistan) |
+| AI | Anthropic `claude-sonnet-4-6` with web search tool |
+| Fonts | Open Sans · EB Garamond · Gulzar (Urdu Nastaliq) — Google Fonts |
+| State | React `useReducer` — no external library |
+| Routing | Single-page wizard — no React Router |
+| Backend | None — frontend-only |
+| Deployment | Vercel |
+
+---
+
+## Project structure
+
+```
+src/
+├── data/
+│   ├── manifestos.js          ← 20 KP manifesto chunks (PTI, ANP, JUI-F)
+│   ├── departments.js         ← 10 KP departments with PIO info
+│   ├── kp-rti-act.js          ← Key KP RTI Act 2013 provisions
+│   └── demo-responses.js      ← 16 pre-baked demo responses (EN + UR)
+├── lib/
+│   ├── claude.js              ← Anthropic API wrapper + extractJSON utility
+│   ├── prompts.js             ← All system prompts (research, routing, draft)
+│   └── manifesto-search.js    ← Keyword matching with stopword filter
+├── components/
+│   ├── layout/                ← Header (gradient + KP emblem), StepIndicator
+│   ├── steps/                 ← QueryInput, ResearchPanel, RoutingConfirm,
+│   │                              RTIDraft, SubmissionGuide
+│   └── ui/                    ← Button, Card, Badge, StatusTag, Spinner, UrduText
+├── hooks/
+│   └── useWizard.js           ← 5-step wizard state (useReducer)
+└── styles/
+    ├── globals.css             ← Tailwind v4 @theme, Nizam tokens, print CSS
+    └── rtl.css                 ← RTL utilities
+```
+
+---
 
 ## Scope
 
-KP RTI Act 2013 only. Does not cover Federal, Punjab, Sindh, or Balochistan RTI law. Does not file RTI requests — produces a draft the citizen submits themselves.
+- **KP RTI Act 2013 only.** Does not cover Federal, Punjab, Sindh, or Balochistan RTI law.
+- **No filing.** The tool produces a draft the citizen submits themselves — it does not connect to any government system.
+- **No backend, no database, no authentication.**
+
+---
+
+## Hackathon submission
+
+- **Event:** AI for Civic Innovation Hackathon 2026
+- **Organisers:** Code for Pakistan · FAST NUCES · Grey Software · Scrimba
+- **Submitted by:** Haris Ahmad Khan
+- **Live URL:** *(Vercel deployment URL)*
+- **Devpost:** *(submission link)*
