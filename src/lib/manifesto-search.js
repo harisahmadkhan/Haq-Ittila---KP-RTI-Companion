@@ -1,5 +1,7 @@
 import { MANIFESTO_CHUNKS } from '../data/manifestos.js';
 
+export const KP_GOVERNING_PARTY = 'PTI';
+
 const STOPWORDS = new Set(['the', 'for', 'why', 'are', 'was', 'has', 'have', 'not', 'and', 'did', 'how', 'what', 'who', 'when']);
 
 export function findRelevantChunks(query, maxChunks = 3) {
