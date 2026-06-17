@@ -19,7 +19,6 @@ function fakeId() {
 }
 function fakeCitizen() { return `Citizen #${Math.floor(Math.random() * 9000) + 1000}`; }
 
-// Inline sparkline
 function Sparkline({ records }) {
   const months = {};
   records.forEach(r => {
@@ -49,7 +48,6 @@ function Sparkline({ records }) {
   );
 }
 
-// Animated number — flashes gold on change
 function LiveNumber({ value, color, className }) {
   const [display, setDisplay] = useState(value);
   const [flash,   setFlash]   = useState(false);
@@ -85,6 +83,15 @@ function StatusPill({ status }) {
     <span className="text-[10px] font-semibold font-sans px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: s.bg, color: s.color }}>
       {status}
     </span>
+  );
+}
+
+function InsightCard({ title, children }) {
+  return (
+    <div className="border border-[var(--color-border)] rounded-lg bg-[var(--color-surface)] p-3">
+      <h4 className="font-serif font-semibold text-[var(--color-foreground)] text-xs mb-2.5">{title}</h4>
+      {children}
+    </div>
   );
 }
 
@@ -124,7 +131,53 @@ export default function RTIFeed() {
       .sort((a, b) => b.pct - a.pct);
   }, [filtered]);
 
-  // Simulated live filings
+  // Party breakdown
+  const partyStats = useMemo(() => {
+    const map = {};
+    filtered.forEach(r => {
+      map[r.partyOfOrigin] = (map[r.partyOfOrigin] || 0) + 1;
+    });
+    const total = filtered.length || 1;
+    return Object.entries(map)
+      .map(([party, count]) => ({ party, count, pct: Math.round((count / total) * 100) }))
+      .sort((a, b) => b.count - a.count);
+  }, [filtered]);
+
+  // Top cities
+  const cityStats = useMemo(() => {
+    const map = {};
+    filtered.forEach(r => {
+      map[r.city] = (map[r.city] || 0) + 1;
+    });
+    return Object.entries(map)
+      .map(([city, count]) => ({ city, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [filtered]);
+
+  // Timeline
+  const timeline = useMemo(() => {
+    if (filtered.length === 0) return { first: null, last: null, avgPerWeek: 0 };
+    const sorted = [...filtered].sort((a, b) => a.filedDate.localeCompare(b.filedDate));
+    const first = new Date(sorted[0].filedDate);
+    const last = new Date(sorted[sorted.length - 1].filedDate);
+    const days = Math.max(1, Math.floor((new Date() - first) / (1000 * 60 * 60 * 24)));
+    const weeks = Math.max(1, days / 7);
+    const avgPerWeek = Math.round(filtered.length / weeks);
+    return { first, last, avgPerWeek, daysAgo: days };
+  }, [filtered]);
+
+  // Key alerts
+  const alerts = useMemo(() => {
+    const result = [];
+    if (overdue > 0) result.push({ icon: '⚠', text: `${overdue} RTI${overdue === 1 ? '' : 's'} overdue >14 days` });
+    const topDept = deptStats[0];
+    if (topDept && topDept.pct === 100) result.push({ icon: '✓', text: `${topDept.dept} at 100% response` });
+    if (inProcess > 0) result.push({ icon: '⏳', text: `${inProcess} RTI${inProcess === 1 ? '' : 's'} awaiting response` });
+    if (topDept) result.push({ icon: '📊', text: `${topDept.dept} leads in responsiveness` });
+    return result.slice(0, 4);
+  }, [overdue, deptStats, inProcess]);
+
   useEffect(() => {
     const tick = () => {
       const dept   = pick(DEPARTMENTS);
@@ -157,7 +210,6 @@ export default function RTIFeed() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
 
-      {/* Vision Preview — compact strip */}
       <div className="flex items-center gap-2 text-xs font-sans text-[var(--color-muted)] mb-5 px-1">
         <span className="text-[var(--color-warning)]">⚠</span>
         <span><span className="font-semibold text-[var(--color-foreground)]">Vision Preview</span> — illustrative data, shown as it will appear once the KP Information Commission hosts a live shared database.</span>
@@ -209,7 +261,6 @@ export default function RTIFeed() {
       {/* Full-width Activity Feed Card */}
       <div className="border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)] mb-6">
 
-        {/* Feed header with filters integrated */}
         <div className="px-5 py-4 border-b border-[var(--color-border)]">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-base">Live Activity Feed</h3>
@@ -219,7 +270,6 @@ export default function RTIFeed() {
             </div>
           </div>
 
-          {/* Inline filter row */}
           <div className="flex flex-wrap gap-2.5 items-center">
             <span className="font-sans text-[10px] text-[var(--color-muted)] font-semibold uppercase tracking-wider">Filter:</span>
             {[
@@ -248,7 +298,6 @@ export default function RTIFeed() {
           </div>
         </div>
 
-        {/* Feed list — tall scrollable area */}
         <ul className="divide-y divide-[var(--color-border)]" style={{ maxHeight: 480, overflowY: 'auto' }}>
           {recentFeed.map((r, i) => (
             <li
@@ -278,30 +327,30 @@ export default function RTIFeed() {
         </ul>
       </div>
 
-      {/* Secondary analytics grid below */}
+      {/* Analytics grid: Leaderboard (left) + 4 Insights (right 2x2) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-        {/* Department leaderboard — takes 2 cols on desktop */}
-        <div className="lg:col-span-2 border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)]">
-          <div className="px-5 py-3 border-b border-[var(--color-border)]">
-            <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-base">Department Response Rates</h3>
-            <p className="font-sans text-xs text-[var(--color-muted)]">Answered ÷ received</p>
+        {/* Department leaderboard — compact, takes 1 col */}
+        <div className="lg:col-span-1 border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)]">
+          <div className="px-4 py-2.5 border-b border-[var(--color-border)]">
+            <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-sm">Response Rates</h3>
+            <p className="font-sans text-[10px] text-[var(--color-muted)]">Answered ÷ received</p>
           </div>
-          <ul className="divide-y divide-[var(--color-border)]" style={{ maxHeight: 320, overflowY: 'auto' }}>
+          <ul className="divide-y divide-[var(--color-border)]" style={{ maxHeight: 280, overflowY: 'auto' }}>
             {deptStats.map((d, i) => (
-              <li key={d.dept} className="px-5 py-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className={`font-sans text-xs font-bold w-5 flex-shrink-0 ${i === 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted)]'}`}>
+              <li key={d.dept} className="px-3 py-2">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className={`font-sans text-[9px] font-bold w-4 flex-shrink-0 ${i === 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted)]'}`}>
                       {i + 1}
                     </span>
-                    <p className="font-sans text-sm text-[var(--color-foreground)] truncate">{d.dept}</p>
+                    <p className="font-sans text-xs text-[var(--color-foreground)] truncate">{d.dept}</p>
                   </div>
-                  <p className="font-sans text-sm font-bold ml-2 flex-shrink-0" style={{ color: d.pct >= 60 ? 'var(--color-success)' : d.pct >= 40 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
+                  <p className="font-sans text-xs font-bold ml-1 flex-shrink-0" style={{ color: d.pct >= 60 ? 'var(--color-success)' : d.pct >= 40 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
                     {d.pct}%
                   </p>
                 </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(201,162,39,0.1)' }}>
+                <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(201,162,39,0.1)' }}>
                   <div
                     className="h-full rounded-full transition-all duration-700"
                     style={{
@@ -310,36 +359,85 @@ export default function RTIFeed() {
                     }}
                   />
                 </div>
-                <p className="font-sans text-[10px] text-[var(--color-muted)] mt-1">{d.answered}/{d.total} answered</p>
               </li>
             ))}
             {deptStats.length === 0 && (
-              <li className="px-5 py-8 text-center">
-                <p className="font-sans text-sm text-[var(--color-muted)]">No data for current filters.</p>
+              <li className="px-4 py-6 text-center">
+                <p className="font-sans text-xs text-[var(--color-muted)]">No data</p>
               </li>
             )}
           </ul>
         </div>
 
-        {/* Summary card — takes 1 col */}
-        <div className="border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)] p-5">
-          <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-base mb-4">Summary</h3>
-          <div className="space-y-3">
-            <div>
-              <p className="font-sans text-[10px] uppercase tracking-wider text-[var(--color-muted)] mb-1">Total Filings</p>
-              <p className="font-serif text-2xl font-bold text-[var(--color-primary)]">{filtered.length}</p>
+        {/* Insight cards grid: 2x2 — takes 2 cols */}
+        <div className="lg:col-span-2 grid grid-cols-2 gap-3">
+
+          {/* Party Breakdown */}
+          <InsightCard title="Promises Driving RTIs">
+            <div className="space-y-1.5">
+              {partyStats.map(p => (
+                <div key={p.party}>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <p className="font-sans text-xs text-[var(--color-foreground)]">{p.party}</p>
+                    <p className="font-sans text-xs font-bold text-[var(--color-primary)]">{p.pct}%</p>
+                  </div>
+                  <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(201,162,39,0.1)' }}>
+                    <div className="h-full bg-[var(--color-primary)]" style={{ width: `${p.pct}%` }} />
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <p className="font-sans text-[10px] uppercase tracking-wider text-[var(--color-muted)] mb-1">Success Rate</p>
-              <p className="font-serif text-2xl font-bold" style={{ color: rate >= 60 ? 'var(--color-success)' : rate >= 40 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
-                {rate}%
-              </p>
-            </div>
-            <div>
-              <p className="font-sans text-[10px] uppercase tracking-wider text-[var(--color-muted)] mb-1">Overdue Now</p>
-              <p className="font-serif text-2xl font-bold text-[var(--color-danger)]">{overdue}</p>
-            </div>
-          </div>
+          </InsightCard>
+
+          {/* Top Cities */}
+          <InsightCard title="Most Active Cities">
+            <ul className="space-y-1.5">
+              {cityStats.map((c, i) => (
+                <li key={c.city} className="flex items-center justify-between">
+                  <span className="font-sans text-xs text-[var(--color-foreground)]"><span className="font-bold text-[var(--color-primary)] mr-1.5">{i + 1}.</span>{c.city}</span>
+                  <span className="font-sans text-xs font-bold text-[var(--color-muted)]">{c.count}</span>
+                </li>
+              ))}
+            </ul>
+          </InsightCard>
+
+          {/* Key Alerts */}
+          <InsightCard title="Quick Alerts">
+            <ul className="space-y-1.5">
+              {alerts.map((a, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-xs flex-shrink-0">{a.icon}</span>
+                  <p className="font-sans text-xs text-[var(--color-foreground)] leading-snug">{a.text}</p>
+                </li>
+              ))}
+              {alerts.length === 0 && (
+                <p className="font-sans text-xs text-[var(--color-muted)]">All systems nominal</p>
+              )}
+            </ul>
+          </InsightCard>
+
+          {/* Timeline */}
+          <InsightCard title="Filing Timeline">
+            <ul className="space-y-1.5">
+              {timeline.first && (
+                <>
+                  <li>
+                    <p className="font-sans text-[9px] text-[var(--color-muted)] uppercase mb-0.5">First filed</p>
+                    <p className="font-sans text-xs text-[var(--color-foreground)]">{timeline.first.toLocaleDateString()} ({timeline.daysAgo} ago)</p>
+                  </li>
+                  <li>
+                    <p className="font-sans text-[9px] text-[var(--color-muted)] uppercase mb-0.5">Most recent</p>
+                    <p className="font-sans text-xs text-[var(--color-foreground)]">{timeline.last.toLocaleDateString()}</p>
+                  </li>
+                  <li>
+                    <p className="font-sans text-[9px] text-[var(--color-muted)] uppercase mb-0.5">Avg rate</p>
+                    <p className="font-sans text-xs font-bold text-[var(--color-primary)]">{timeline.avgPerWeek}/week</p>
+                  </li>
+                </>
+              )}
+            </ul>
+          </InsightCard>
+
         </div>
       </div>
     </div>
