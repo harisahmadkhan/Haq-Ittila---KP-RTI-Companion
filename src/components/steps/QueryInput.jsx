@@ -14,16 +14,16 @@ import IconTree from '../icons/IconTree.jsx';
 import IconCoin from '../icons/IconCoin.jsx';
 
 const ICON_MAP = {
-  Education:        IconBook,
-  Health:           IconCross,
-  Infrastructure:   IconBridge,
-  Agriculture:      IconWheat,
-  Energy:           IconBolt,
+  Education:            IconBook,
+  Health:               IconCross,
+  Infrastructure:       IconBridge,
+  Agriculture:          IconWheat,
+  Energy:               IconBolt,
   'Water & Sanitation': IconDroplet,
   'Local Government':   IconTownHall,
-  Police:           IconShield,
-  Forestry:         IconTree,
-  Finance:          IconCoin,
+  Police:               IconShield,
+  Forestry:             IconTree,
+  Finance:              IconCoin,
 };
 
 const EXAMPLE_CATEGORIES = [
@@ -32,6 +32,8 @@ const EXAMPLE_CATEGORIES = [
     queries: [
       'Has the government built the promised schools in Swat district?',
       'How many ghost schools were closed or merged in KP since 2022?',
+      'What percentage of KP public school buildings have basic sanitation and clean water facilities?',
+      'How much has the KP government spent on textbook printing and distribution since 2021?',
     ],
   },
   {
@@ -39,6 +41,8 @@ const EXAMPLE_CATEGORIES = [
     queries: [
       'How many doctors were hired for rural health centres in 2024?',
       'Are Sehat Sahulat health cards active and functional in all KP districts?',
+      'What is the status of hospital waste management in KP public hospitals?',
+      'How many lady health workers are active and receiving salaries in each KP district?',
     ],
   },
   {
@@ -46,6 +50,8 @@ const EXAMPLE_CATEGORIES = [
     queries: [
       'Why is the Peshawar BRT budget unaccounted for?',
       'What is the progress and total expenditure on the DI Khan to Peshawar Motorway?',
+      'What is the current state of Swat Motorway Phase 2 and where have the allocated funds gone?',
+      'How many KP public buildings have been earthquake-retrofitted under the KP Earthquake Resilience Programme?',
     ],
   },
   {
@@ -53,6 +59,8 @@ const EXAMPLE_CATEGORIES = [
     queries: [
       'How many KP farmers received the promised subsidised fertiliser in 2024?',
       'What is the status of the KP agricultural land records digitisation programme?',
+      'What is the status of the KP olive cultivation programme that was promised in the manifesto?',
+      'Has the KP government established agricultural advisory services in merged districts?',
     ],
   },
   {
@@ -60,12 +68,17 @@ const EXAMPLE_CATEGORIES = [
     queries: [
       'Why are KP hydropower projects delayed and where has the allocated budget gone?',
       'What percentage of merged district villages have been electrified since 2021?',
+      'What is the financial performance of the KP Energy Development Organisation and how much of its budget goes to administration?',
+      'How much has KP received in net hydel profits from WAPDA and is the amount disputed?',
     ],
   },
   {
     label: 'Water & Sanitation',
     queries: [
       'Why is clean drinking water still not available in Kohistan villages?',
+      'What is the current sewage treatment capacity in KP cities versus actual sewage volume generated?',
+      'What percentage of KP public schools have functional toilets and handwashing facilities as measured by PHED?',
+      'What is the progress on new water storage dams being constructed in KP?',
     ],
   },
   {
@@ -73,6 +86,8 @@ const EXAMPLE_CATEGORIES = [
     queries: [
       'What happened to the funds allocated for Charsadda flood relief?',
       'When will KP hold local body elections and what is the legal basis for the delay?',
+      'What is the total budget allocated to KP Union Councils and how is it being administered without elected members?',
+      'How much municipal solid waste is being collected in Peshawar and where is it disposed?',
     ],
   },
   {
@@ -80,12 +95,17 @@ const EXAMPLE_CATEGORIES = [
     queries: [
       'What is the status of police station upgrades under KP Police Act 2017?',
       'How many police officers were recruited on merit in KP in 2023 and 2024?',
+      'What is the FIR registration rate across KP police stations and are any districts refusing to register FIRs?',
+      'How many custody deaths have been reported in KP police stations since 2022?',
     ],
   },
   {
     label: 'Forestry',
     queries: [
       'What is the current status and verified area coverage of the Billion Tree Tsunami in KP?',
+      'How much revenue has KP collected from timber auctions since 2021 and how was it utilised?',
+      'What is the status of enforcement under the KP Wildlife Protection Act 2015?',
+      'How many forest fires occurred in KP in 2023 and what area was destroyed?',
     ],
   },
   {
@@ -99,6 +119,60 @@ const EXAMPLE_CATEGORIES = [
   },
 ];
 
+function CategoryCard({ cat, onSelect }) {
+  const [open, setOpen] = useState(false);
+  const CatIcon = ICON_MAP[cat.label];
+
+  return (
+    <div
+      className="relative rounded-xl border border-[var(--color-border)] overflow-hidden hover:border-[var(--color-primary)] transition-colors min-h-[11rem]"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}
+    >
+      {/* Underlying header + query buttons — always rendered for accessibility */}
+      <div className="px-4 py-2.5 border-b border-[var(--color-border)] flex items-center gap-2">
+        {CatIcon && <CatIcon className="w-3.5 h-3.5 text-[var(--color-primary)]" />}
+        <p className="text-xs font-sans font-bold text-[var(--color-primary)] uppercase tracking-wider">{cat.label}</p>
+      </div>
+      <div className="p-3 flex flex-col gap-2">
+        {cat.queries.map(q => (
+          <button
+            key={q}
+            onClick={() => onSelect(q)}
+            className="w-full text-left text-xs font-sans text-[var(--color-muted)] bg-[var(--color-primary-accent)] rounded-lg px-3 py-2 hover:bg-[var(--color-primary)] hover:text-[var(--color-background)] transition-colors leading-snug"
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+
+      {/* Overlay: covers card by default; fades away on hover / focus-within / tap */}
+      <div
+        aria-hidden={open}
+        onClick={() => setOpen(true)}
+        className="absolute inset-0 flex flex-col items-center justify-center gap-3 transition-opacity duration-[220ms] ease-out select-none"
+        style={{
+          background: 'linear-gradient(160deg, #0B2417 0%, #061610 100%)',
+          opacity: open ? 0 : 1,
+          pointerEvents: open ? 'none' : 'auto',
+        }}
+      >
+        {CatIcon && (
+          <CatIcon className="w-9 h-9 text-[var(--color-primary)]" />
+        )}
+        <p className="font-serif font-semibold text-[var(--color-primary)] text-base tracking-wide text-center px-4">
+          {cat.label}
+        </p>
+        <p className="font-sans text-[var(--color-muted)] text-[10px] uppercase tracking-widest opacity-60">
+          {cat.queries.length} questions
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function QueryInput({ selectedParties, onPartiesChange, onSubmit }) {
   const [query, setQuery] = useState('');
 
@@ -108,12 +182,11 @@ export default function QueryInput({ selectedParties, onPartiesChange, onSubmit 
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Hero banner with gold corner brackets */}
+      {/* Hero banner */}
       <div
         className="rounded-2xl px-8 py-10 text-center mb-8 shadow-xl relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, var(--color-background) 0%, #0f2e1e 50%, #0B2417 100%)' }}
       >
-        {/* Gold corner brackets */}
         <span className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[var(--color-primary)] rounded-tl-sm opacity-60" />
         <span className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[var(--color-primary)] rounded-tr-sm opacity-60" />
         <span className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[var(--color-primary)] rounded-bl-sm opacity-60" />
@@ -161,28 +234,9 @@ export default function QueryInput({ selectedParties, onPartiesChange, onSubmit 
           Or pick an example question by category
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {EXAMPLE_CATEGORIES.map(cat => {
-            const CatIcon = ICON_MAP[cat.label];
-            return (
-              <div key={cat.label} className="bg-transparent rounded-xl border border-[var(--color-border)] overflow-hidden hover:border-[var(--color-primary)] transition-colors">
-                <div className="px-4 py-2.5 border-b border-[var(--color-border)] flex items-center gap-2">
-                  {CatIcon && <CatIcon className="w-3.5 h-3.5 text-[var(--color-primary)]" />}
-                  <p className="text-xs font-sans font-bold text-[var(--color-primary)] uppercase tracking-wider">{cat.label}</p>
-                </div>
-                <div className="p-3 flex flex-col gap-2">
-                  {cat.queries.map(q => (
-                    <button
-                      key={q}
-                      onClick={() => setQuery(q)}
-                      className="w-full text-left text-xs font-sans text-[var(--color-muted)] bg-[var(--color-primary-accent)] rounded-lg px-3 py-2 hover:bg-[var(--color-primary)] hover:text-[var(--color-background)] transition-colors leading-snug"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+          {EXAMPLE_CATEGORIES.map(cat => (
+            <CategoryCard key={cat.label} cat={cat} onSelect={setQuery} />
+          ))}
         </div>
       </div>
     </div>
