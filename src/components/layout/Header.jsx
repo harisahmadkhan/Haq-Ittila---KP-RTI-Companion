@@ -28,7 +28,7 @@ export default function Header({ isDemo }) {
             Haq Ittila
             <span className="ml-2 font-naskh text-[var(--color-foreground)]/70 font-normal text-base">حق اطلاع</span>
           </h1>
-          <p className="text-xs text-[var(--color-muted)] font-sans mt-0.5">KP Right to Information Companion</p>
+          <p className="text-xs text-[var(--color-muted)] font-sans mt-0.5">KP RTI Information Commons</p>
         </div>
         <div className="flex items-center gap-3">
           <DemoModeBadge isDemo={!!isDemo} />

@@ -5,7 +5,6 @@ const DEPARTMENTS = ['Education', 'Health', 'Infrastructure', 'Agriculture', 'Fi
 const CITIES      = ['Peshawar', 'Mardan', 'Swat', 'Abbottabad', 'Kohat', 'Bannu', 'D.I. Khan', 'Charsadda', 'Nowshera', 'Swabi'];
 const PARTIES     = ['PTI', 'ANP', 'JUI-F', 'PML-N', 'PPP'];
 
-// Weighted random — PTI gets more weight (governing party)
 const PARTY_WEIGHTS = { PTI: 4, ANP: 2, 'JUI-F': 2, 'PML-N': 1, PPP: 1 };
 function weightedParty() {
   const pool = PARTIES.flatMap(p => Array(PARTY_WEIGHTS[p]).fill(p));
@@ -20,7 +19,7 @@ function fakeId() {
 }
 function fakeCitizen() { return `Citizen #${Math.floor(Math.random() * 9000) + 1000}`; }
 
-// Inline sparkline — minimal pill bars
+// Inline sparkline
 function Sparkline({ records }) {
   const months = {};
   records.forEach(r => {
@@ -98,7 +97,6 @@ export default function RTIFeed() {
 
   const seed = useMemo(() => getAllLocalAndSeededRecords(), []);
 
-  // Combine seed + live items
   const all = useMemo(() => {
     return [...liveItems, ...seed];
   }, [seed, liveItems]);
@@ -126,7 +124,7 @@ export default function RTIFeed() {
       .sort((a, b) => b.pct - a.pct);
   }, [filtered]);
 
-  // Simulated live filings — new record every 3–6 seconds
+  // Simulated live filings
   useEffect(() => {
     const tick = () => {
       const dept   = pick(DEPARTMENTS);
@@ -149,13 +147,12 @@ export default function RTIFeed() {
       setTimeout(() => setPulse(false), 800);
     };
 
-    // First tick is quick to feel immediate
     const first   = setTimeout(tick, 1800);
     const interval = setInterval(tick, 4500);
     return () => { clearTimeout(first); clearInterval(interval); };
   }, []);
 
-  const recentFeed = [...liveItems, ...seed].slice(0, 18);
+  const recentFeed = [...liveItems, ...seed].slice(0, 24);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -171,7 +168,6 @@ export default function RTIFeed() {
         className="rounded-2xl px-6 py-5 mb-6 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #061610 0%, #0B2417 60%, #0f2e1e 100%)' }}
       >
-        {/* Live pulse dot */}
         <div className="absolute top-4 right-5 flex items-center gap-1.5">
           <span
             className="w-2 h-2 rounded-full"
@@ -181,10 +177,9 @@ export default function RTIFeed() {
               transition: 'box-shadow 0.3s',
             }}
           />
-          <span className="font-sans text-[10px] font-semibold uppercase tracking-widest text-[var(--color-primary)]">Live</span>
+          <span className="font-sans text-[10px] font-semibold uppercase tracking-widest text-[var(--color-primary)]">DEMO</span>
         </div>
 
-        {/* Stat numbers */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
           {[
             { label: 'Total Received', value: filtered.length, color: 'var(--color-primary)' },
@@ -199,7 +194,6 @@ export default function RTIFeed() {
           ))}
         </div>
 
-        {/* Overdue + sparkline in one row */}
         <div className="flex items-end justify-between gap-6 pt-4 border-t border-white/10">
           <div className="flex items-baseline gap-2">
             <LiveNumber value={overdue} color="var(--color-danger)" className="font-serif text-2xl font-bold" />
@@ -212,96 +206,102 @@ export default function RTIFeed() {
         </div>
       </div>
 
-      {/* Filter bar — compact inline */}
-      <div className="flex flex-wrap gap-3 mb-6 items-center">
-        <span className="font-sans text-xs text-[var(--color-muted)] font-semibold uppercase tracking-wider">Filter:</span>
-        {[
-          { label: 'Dept',   value: deptFilter,  onChange: setDeptFilter,  options: DEPARTMENTS },
-          { label: 'City',   value: cityFilter,  onChange: setCityFilter,  options: CITIES },
-          { label: 'Party',  value: partyFilter, onChange: setPartyFilter, options: PARTIES },
-        ].map(f => (
-          <select
-            key={f.label}
-            value={f.value}
-            onChange={e => f.onChange(e.target.value)}
-            className="font-sans text-xs text-[var(--color-foreground)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-          >
-            <option value="">All {f.label}s</option>
-            {f.options.map(o => <option key={o} value={o}>{o}</option>)}
-          </select>
-        ))}
-        {(deptFilter || cityFilter || partyFilter) && (
-          <button
-            onClick={() => { setDeptFilter(''); setCityFilter(''); setPartyFilter(''); }}
-            className="font-sans text-xs text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors"
-          >
-            Clear ×
-          </button>
-        )}
-      </div>
+      {/* Full-width Activity Feed Card */}
+      <div className="border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)] mb-6">
 
-      {/* Feed + leaderboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-
-        {/* Recently filed feed — wider column */}
-        <div className="lg:col-span-3 border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)]">
-          <div className="px-4 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
-            <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-sm">Live Activity</h3>
+        {/* Feed header with filters integrated */}
+        <div className="px-5 py-4 border-b border-[var(--color-border)]">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-base">Live Activity Feed</h3>
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" style={{ animation: 'ping 1.5s cubic-bezier(0,0,0.2,1) infinite' }} />
               <span className="font-sans text-[10px] text-[var(--color-muted)] uppercase tracking-wide">Updating</span>
             </div>
           </div>
-          <ul className="divide-y divide-[var(--color-border)]" style={{ maxHeight: 360, overflowY: 'auto' }}>
-            {recentFeed.map((r, i) => (
-              <li
-                key={r.id}
-                className="px-4 py-2.5 flex items-center justify-between gap-3 transition-colors"
-                style={{
-                  background: r._live && i === 0 ? 'rgba(0,172,72,0.04)' : undefined,
-                }}
+
+          {/* Inline filter row */}
+          <div className="flex flex-wrap gap-2.5 items-center">
+            <span className="font-sans text-[10px] text-[var(--color-muted)] font-semibold uppercase tracking-wider">Filter:</span>
+            {[
+              { label: 'Department', value: deptFilter,  onChange: setDeptFilter,  options: DEPARTMENTS },
+              { label: 'City',       value: cityFilter,  onChange: setCityFilter,  options: CITIES },
+              { label: 'Party',      value: partyFilter, onChange: setPartyFilter, options: PARTIES },
+            ].map(f => (
+              <select
+                key={f.label}
+                value={f.value}
+                onChange={e => f.onChange(e.target.value)}
+                className="font-sans text-[11px] text-[var(--color-foreground)] bg-[var(--color-background)] border border-[var(--color-border)] rounded px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
               >
-                <div className="min-w-0 flex-1">
-                  <p className="font-sans text-xs text-[var(--color-foreground)] truncate leading-snug">
-                    <span className="font-medium">{r.citizenLabel}</span>
-                    <span className="text-[var(--color-muted)]"> → </span>
-                    <span className="text-[var(--color-primary)] font-medium">{r.department}</span>
-                    <span className="text-[var(--color-muted)]"> · {r.city}</span>
-                  </p>
-                  <p className="font-sans text-[10px] text-[var(--color-muted)] mt-0.5">{r.partyOfOrigin} promise · {r.filedDate}</p>
-                </div>
-                <StatusPill status={r.status} />
-              </li>
+                <option value="">All {f.label}</option>
+                {f.options.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
             ))}
-            {recentFeed.length === 0 && (
-              <li className="px-4 py-10 text-center">
-                <p className="font-sans text-xs text-[var(--color-muted)]">No records match the current filters.</p>
-              </li>
+            {(deptFilter || cityFilter || partyFilter) && (
+              <button
+                onClick={() => { setDeptFilter(''); setCityFilter(''); setPartyFilter(''); }}
+                className="font-sans text-[10px] text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors"
+              >
+                Clear ×
+              </button>
             )}
-          </ul>
+          </div>
         </div>
 
-        {/* Department leaderboard — narrower column */}
+        {/* Feed list — tall scrollable area */}
+        <ul className="divide-y divide-[var(--color-border)]" style={{ maxHeight: 480, overflowY: 'auto' }}>
+          {recentFeed.map((r, i) => (
+            <li
+              key={r.id}
+              className="px-5 py-3 flex items-center justify-between gap-3 transition-colors hover:bg-[rgba(0,172,72,0.02)]"
+              style={{
+                background: r._live && i === 0 ? 'rgba(0,172,72,0.08)' : undefined,
+              }}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="font-sans text-sm text-[var(--color-foreground)] truncate leading-snug">
+                  <span className="font-medium">{r.citizenLabel}</span>
+                  <span className="text-[var(--color-muted)]"> → </span>
+                  <span className="text-[var(--color-primary)] font-medium">{r.department}</span>
+                  <span className="text-[var(--color-muted)]"> · {r.city}</span>
+                </p>
+                <p className="font-sans text-xs text-[var(--color-muted)] mt-0.5">{r.partyOfOrigin} promise · {r.filedDate}</p>
+              </div>
+              <StatusPill status={r.status} />
+            </li>
+          ))}
+          {recentFeed.length === 0 && (
+            <li className="px-5 py-10 text-center">
+              <p className="font-sans text-sm text-[var(--color-muted)]">No records match the current filters.</p>
+            </li>
+          )}
+        </ul>
+      </div>
+
+      {/* Secondary analytics grid below */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+        {/* Department leaderboard — takes 2 cols on desktop */}
         <div className="lg:col-span-2 border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)]">
-          <div className="px-4 py-3 border-b border-[var(--color-border)]">
-            <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-sm">Response Rates</h3>
-            <p className="font-sans text-[10px] text-[var(--color-muted)]">Answered ÷ received</p>
+          <div className="px-5 py-3 border-b border-[var(--color-border)]">
+            <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-base">Department Response Rates</h3>
+            <p className="font-sans text-xs text-[var(--color-muted)]">Answered ÷ received</p>
           </div>
-          <ul className="divide-y divide-[var(--color-border)]" style={{ maxHeight: 360, overflowY: 'auto' }}>
+          <ul className="divide-y divide-[var(--color-border)]" style={{ maxHeight: 320, overflowY: 'auto' }}>
             {deptStats.map((d, i) => (
-              <li key={d.dept} className="px-4 py-2.5">
-                <div className="flex items-center justify-between mb-1">
+              <li key={d.dept} className="px-5 py-3">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className={`font-sans text-[10px] font-bold w-4 flex-shrink-0 ${i === 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted)]'}`}>
+                    <span className={`font-sans text-xs font-bold w-5 flex-shrink-0 ${i === 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted)]'}`}>
                       {i + 1}
                     </span>
-                    <p className="font-sans text-xs text-[var(--color-foreground)] truncate">{d.dept}</p>
+                    <p className="font-sans text-sm text-[var(--color-foreground)] truncate">{d.dept}</p>
                   </div>
-                  <p className="font-sans text-xs font-bold ml-2 flex-shrink-0" style={{ color: d.pct >= 60 ? 'var(--color-success)' : d.pct >= 40 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
+                  <p className="font-sans text-sm font-bold ml-2 flex-shrink-0" style={{ color: d.pct >= 60 ? 'var(--color-success)' : d.pct >= 40 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
                     {d.pct}%
                   </p>
                 </div>
-                <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(201,162,39,0.1)' }}>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(201,162,39,0.1)' }}>
                   <div
                     className="h-full rounded-full transition-all duration-700"
                     style={{
@@ -310,14 +310,36 @@ export default function RTIFeed() {
                     }}
                   />
                 </div>
+                <p className="font-sans text-[10px] text-[var(--color-muted)] mt-1">{d.answered}/{d.total} answered</p>
               </li>
             ))}
             {deptStats.length === 0 && (
-              <li className="px-4 py-8 text-center">
-                <p className="font-sans text-xs text-[var(--color-muted)]">No data for current filters.</p>
+              <li className="px-5 py-8 text-center">
+                <p className="font-sans text-sm text-[var(--color-muted)]">No data for current filters.</p>
               </li>
             )}
           </ul>
+        </div>
+
+        {/* Summary card — takes 1 col */}
+        <div className="border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface)] p-5">
+          <h3 className="font-serif font-semibold text-[var(--color-foreground)] text-base mb-4">Summary</h3>
+          <div className="space-y-3">
+            <div>
+              <p className="font-sans text-[10px] uppercase tracking-wider text-[var(--color-muted)] mb-1">Total Filings</p>
+              <p className="font-serif text-2xl font-bold text-[var(--color-primary)]">{filtered.length}</p>
+            </div>
+            <div>
+              <p className="font-sans text-[10px] uppercase tracking-wider text-[var(--color-muted)] mb-1">Success Rate</p>
+              <p className="font-serif text-2xl font-bold" style={{ color: rate >= 60 ? 'var(--color-success)' : rate >= 40 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
+                {rate}%
+              </p>
+            </div>
+            <div>
+              <p className="font-sans text-[10px] uppercase tracking-wider text-[var(--color-muted)] mb-1">Overdue Now</p>
+              <p className="font-serif text-2xl font-bold text-[var(--color-danger)]">{overdue}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

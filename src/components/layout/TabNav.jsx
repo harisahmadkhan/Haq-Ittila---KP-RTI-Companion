@@ -1,8 +1,8 @@
 export default function TabNav({ activeTab, onTabChange }) {
   const tabs = [
-    { id: 'feed',  label: 'RTI Feed',      urdu: 'فیڈ' },
-    { id: 'file',  label: 'File RTI',      urdu: 'درخواست' },
-    { id: 'track', label: 'Track My RTI',  urdu: 'ٹریک' },
+    { id: 'feed',  label: 'Information Commons', urdu: 'کمنز' },
+    { id: 'file',  label: 'File RTI',            urdu: 'درخواست' },
+    { id: 'track', label: 'Track My RTI',        urdu: 'ٹریک' },
   ];
 
   return (
