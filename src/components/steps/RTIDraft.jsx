@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Button from '../ui/Button.jsx';
 import Card from '../ui/Card.jsx';
 import Spinner from '../ui/Spinner.jsx';
@@ -9,12 +9,13 @@ import { RTI_DRAFT_PROMPT } from '../../lib/prompts.js';
 import { DEMO_RESPONSES } from '../../data/demo-responses.js';
 
 export default function RTIDraft({ query, researchSummary, department, routingReason, onDraftDone, onNext, onBack }) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
-  const [draft, setDraft]     = useState(null);
-  const [bodyEn, setBodyEn]   = useState('');
-  const [bodyUr, setBodyUr]   = useState('');
-  const [copied, setCopied]   = useState('');
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
+  const [draft, setDraft]       = useState(null);
+  const [bodyEn, setBodyEn]     = useState('');
+  const [bodyUr, setBodyUr]     = useState('');
+  const [copied, setCopied]     = useState('');
+  const [mobileTab, setMobileTab] = useState('en');
 
   useEffect(() => {
     let cancelled = false;
@@ -69,7 +70,7 @@ export default function RTIDraft({ query, researchSummary, department, routingRe
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-6xl mx-auto px-4 py-16 text-center">
         <Spinner size="lg" />
         <p className="font-sans text-[var(--color-muted)] mt-4">Drafting your RTI request in English and Urdu...</p>
       </div>
@@ -78,7 +79,7 @@ export default function RTIDraft({ query, researchSummary, department, routingRe
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 text-center">
+      <div className="max-w-6xl mx-auto px-4 py-10 text-center">
         <p className="text-[var(--color-danger)] font-sans mb-4">Draft generation failed: {error}</p>
         <Button variant="secondary" onClick={onBack}>← Go back</Button>
       </div>
@@ -86,16 +87,33 @@ export default function RTIDraft({ query, researchSummary, department, routingRe
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 print-area">
+    <div className="max-w-6xl mx-auto px-4 py-8 print-area">
       <h2 className="font-serif font-bold text-xl text-[var(--color-foreground)] mb-1">Your RTI Request</h2>
       <p className="text-sm text-[var(--color-muted)] font-sans mb-4">Both drafts are editable. Review and customise before submitting.</p>
 
       {/* Pre-filing deadline timer (neutral state) */}
       <DeadlineTimer filedDate={null} />
 
+      {/* Mobile tab switcher — visible below md, hidden above */}
+      <div className="flex gap-2 mb-4 md:hidden">
+        {[{ id: 'en', label: 'English' }, { id: 'ur', label: 'اردو' }].map(t => (
+          <button
+            key={t.id}
+            onClick={() => setMobileTab(t.id)}
+            className={`flex-1 py-2 rounded-lg font-sans text-sm font-semibold border transition-colors ${
+              mobileTab === t.id
+                ? 'bg-[var(--color-primary)] text-[var(--color-background)] border-[var(--color-primary)]'
+                : 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-primary)]'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {/* English draft */}
-        <div>
+        {/* English draft — always visible on md+, conditionally on mobile */}
+        <div className={mobileTab === 'ur' ? 'hidden md:block' : ''}>
           <div className="border border-[var(--color-border)] border-b-0 rounded-t-xl px-5 py-3 bg-[var(--color-primary-accent)]">
             <p className="font-sans text-xs text-[var(--color-primary)] uppercase tracking-wide font-semibold mb-0.5">Subject</p>
             <p className="font-sans text-[var(--color-foreground)] font-medium">{draft?.subject_en}</p>
@@ -110,8 +128,8 @@ export default function RTIDraft({ query, researchSummary, department, routingRe
           </Button>
         </div>
 
-        {/* Urdu draft */}
-        <div dir="rtl">
+        {/* Urdu draft — always visible on md+, conditionally on mobile */}
+        <div className={mobileTab === 'en' ? 'hidden md:block' : ''} dir="rtl">
           <div className="border border-[var(--color-border)] border-b-0 rounded-t-xl px-5 py-3 bg-[var(--color-primary-accent)]">
             <p className="font-naskh text-xs text-[var(--color-primary)] uppercase tracking-wide font-semibold mb-0.5">موضوع</p>
             <UrduText className="text-[var(--color-foreground)] font-medium block">{draft?.subject_ur}</UrduText>

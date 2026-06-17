@@ -51,7 +51,7 @@ function OctagonBadge({ done, active, children }) {
 
 export default function StepIndicator({ currentStep }) {
   return (
-    <nav className="max-w-5xl mx-auto px-4 py-5">
+    <nav className="max-w-7xl mx-auto px-4 py-5">
       <ol className="flex items-center gap-2">
         {STEPS.map(({ n, label, Icon }, i) => {
           const done    = n < currentStep;

@@ -22,7 +22,7 @@ function KPEmblem() {
 export default function Header({ isDemo }) {
   return (
     <header style={{ background: 'linear-gradient(to right, var(--color-background), #0f2b1a, #0B2417)' }} className="shadow-xl">
-      <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <div>
           <h1 className="font-sans font-bold text-xl text-[var(--color-primary)] tracking-tight">
             Haq Ittila

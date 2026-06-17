@@ -181,59 +181,65 @@ export default function QueryInput({ selectedParties, onPartiesChange, onSubmit 
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Hero banner */}
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Merged hero + input panel */}
       <div
-        className="rounded-2xl px-8 py-10 text-center mb-8 shadow-xl relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, var(--color-background) 0%, #0f2e1e 50%, #0B2417 100%)' }}
+        className="rounded-2xl shadow-xl relative overflow-hidden mb-8"
+        style={{ background: 'linear-gradient(135deg, #0B2417 0%, #0f2e1e 60%, #061610 100%)' }}
       >
-        <span className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[var(--color-primary)] rounded-tl-sm opacity-60" />
-        <span className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[var(--color-primary)] rounded-tr-sm opacity-60" />
-        <span className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[var(--color-primary)] rounded-bl-sm opacity-60" />
-        <span className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[var(--color-primary)] rounded-br-sm opacity-60" />
+        {/* Gold corner brackets */}
+        <span className="absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 border-[var(--color-primary)] rounded-tl-sm opacity-70 pointer-events-none" />
+        <span className="absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 border-[var(--color-primary)] rounded-tr-sm opacity-70 pointer-events-none" />
+        <span className="absolute bottom-4 left-4 w-7 h-7 border-b-2 border-l-2 border-[var(--color-primary)] rounded-bl-sm opacity-70 pointer-events-none" />
+        <span className="absolute bottom-4 right-4 w-7 h-7 border-b-2 border-r-2 border-[var(--color-primary)] rounded-br-sm opacity-70 pointer-events-none" />
 
-        <p className="font-naskh text-[var(--color-primary)]/70 text-lg mb-1">حق اطلاع</p>
-        <h2 className="font-serif font-bold text-2xl md:text-3xl text-[var(--color-foreground)] mb-3 relative">
-          What do you want to know from the KP government?
-        </h2>
-        <p className="text-[var(--color-muted)] font-sans text-sm max-w-xl mx-auto relative">
-          Describe your question in plain language — we'll research manifestos and news, identify the right department, and draft a legally sound RTI request in English and Urdu.
-        </p>
-      </div>
-
-      {/* Party selector */}
-      <PartySelector selectedParties={selectedParties} onPartiesChange={onPartiesChange} />
-
-      {/* Input card */}
-      <Card className="mb-8">
-        <textarea
-          className="w-full h-32 font-sans text-[var(--color-foreground)] bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-4 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] placeholder:text-[var(--color-muted)]"
-          placeholder="e.g. Has the government built the promised schools in Swat? / کیا حکومت نے سوات میں وعدہ کیے گئے اسکول تعمیر کیے؟"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          maxLength={500}
-        />
-        <div className="flex items-center justify-between mt-2 mb-4">
-          <span className="text-xs text-[var(--color-muted)] font-sans">{query.length}/500</span>
-          {query.length > 0 && query.length < 20 && (
-            <span className="text-xs text-[var(--color-warning)] font-sans">Please enter at least 20 characters</span>
-          )}
+        <div className="px-8 pt-10 pb-4 text-center">
+          <p className="font-naskh text-[var(--color-primary)]/70 text-lg mb-1">حق اطلاع</p>
+          <h2 className="font-serif font-bold text-2xl md:text-3xl text-[var(--color-foreground)] mb-3">
+            What do you want to know from the KP government?
+          </h2>
+          <p className="text-[var(--color-muted)] font-sans text-sm max-w-xl mx-auto">
+            Describe your question in plain language — we'll research manifestos and news, identify the right department, and draft a legally sound RTI request in English and Urdu.
+          </p>
         </div>
-        <Button
-          onClick={handleSubmit}
-          disabled={query.trim().length < 20}
-          className="w-full justify-center"
-        >
-          Research this →
-        </Button>
-      </Card>
+
+        {/* Party selector inside the panel */}
+        <div className="px-8 pt-2 pb-4">
+          <PartySelector selectedParties={selectedParties} onPartiesChange={onPartiesChange} />
+        </div>
+
+        {/* Glass-style textarea directly on the panel */}
+        <div className="px-8 pb-8">
+          <textarea
+            className="w-full h-32 font-sans text-[var(--color-foreground)] rounded-lg border border-[var(--color-primary)] p-4 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] placeholder:text-[var(--color-muted)]/60"
+            style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(4px)' }}
+            placeholder="e.g. Has the government built the promised schools in Swat? / کیا حکومت نے سوات میں وعدہ کیے گئے اسکول تعمیر کیے؟"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            maxLength={500}
+          />
+          <div className="flex items-center justify-between mt-2 mb-4">
+            <span className="text-xs text-[var(--color-muted)] font-sans">{query.length}/500</span>
+            {query.length > 0 && query.length < 20 && (
+              <span className="text-xs text-[var(--color-warning)] font-sans">Please enter at least 20 characters</span>
+            )}
+          </div>
+          <Button
+            onClick={handleSubmit}
+            disabled={query.trim().length < 20}
+            className="w-full justify-center"
+          >
+            Research this →
+          </Button>
+        </div>
+      </div>
 
       {/* Category grid */}
       <div className="mb-3">
         <p className="text-xs text-[var(--color-muted)] font-sans mb-4 uppercase tracking-wider font-semibold text-center">
           Or pick an example question by category
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {EXAMPLE_CATEGORIES.map(cat => (
             <CategoryCard key={cat.label} cat={cat} onSelect={setQuery} />
           ))}

@@ -64,7 +64,7 @@ export default function RoutingConfirm({ query, researchSummary, onConfirm, onBa
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-6xl mx-auto px-4 py-16 text-center">
         <Spinner size="lg" />
         <p className="font-sans text-[var(--color-muted)] mt-4">Identifying the responsible department...</p>
       </div>
@@ -73,7 +73,7 @@ export default function RoutingConfirm({ query, researchSummary, onConfirm, onBa
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 text-center">
+      <div className="max-w-6xl mx-auto px-4 py-10 text-center">
         <p className="text-[var(--color-danger)] font-sans mb-4">Routing failed: {error}</p>
         <Button variant="secondary" onClick={onBack}>← Go back</Button>
       </div>
@@ -88,7 +88,7 @@ export default function RoutingConfirm({ query, researchSummary, onConfirm, onBa
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8">
       <h2 className="font-serif font-bold text-xl text-[var(--color-foreground)] mb-1">Responsible Department</h2>
       <p className="text-sm text-[var(--color-muted)] font-sans mb-6">We've identified the KP department that holds the information you need.</p>
 
@@ -138,25 +138,34 @@ export default function RoutingConfirm({ query, researchSummary, onConfirm, onBa
             </div>
           </div>
 
-          {/* Other department details */}
+          {/* Stamped-letter address block */}
+          <div
+            className="rounded-xl border border-dashed border-[var(--color-primary)]/40 p-5 mb-4 relative"
+            style={{ background: 'rgba(201,162,39,0.04)' }}
+          >
+            {/* Wax-seal accent */}
+            <div
+              className="absolute -top-4 right-6 w-8 h-8 rounded-full border-2 border-[var(--color-primary)]/60 flex items-center justify-center text-xs font-bold"
+              style={{ background: 'var(--color-primary)', color: 'var(--color-background)' }}
+              title="KP Information Commission"
+            >
+              ✉
+            </div>
+            <p className="font-sans text-[10px] uppercase tracking-widest text-[var(--color-muted)] mb-2">To</p>
+            <p className="font-serif font-bold text-[var(--color-foreground)] text-base leading-snug">{dept.pio_title}</p>
+            <p className="font-sans font-semibold text-[var(--color-foreground)] text-sm mt-0.5">{dept.name}</p>
+            <p className="font-sans text-sm text-[var(--color-muted)] mt-1 whitespace-pre-line">{dept.address}</p>
+            {dept.email && (
+              <p className="font-sans text-sm text-[var(--color-primary)] mt-2">{dept.email}</p>
+            )}
+          </div>
+
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm font-sans">
-            <div>
-              <dt className="text-[var(--color-muted)] text-xs uppercase tracking-wide font-semibold mb-0.5">PIO Title</dt>
-              <dd className="text-[var(--color-foreground)]">{dept.pio_title}</dd>
-            </div>
-            <div>
-              <dt className="text-[var(--color-muted)] text-xs uppercase tracking-wide font-semibold mb-0.5">Submission Address</dt>
-              <dd className="text-[var(--color-foreground)]">{dept.address}</dd>
-            </div>
-            <div>
-              <dt className="text-[var(--color-muted)] text-xs uppercase tracking-wide font-semibold mb-0.5">Email</dt>
-              <dd className="text-[var(--color-foreground)]">{dept.email}</dd>
-            </div>
             <div>
               <dt className="text-[var(--color-muted)] text-xs uppercase tracking-wide font-semibold mb-0.5">Governing Act</dt>
               <dd className="text-[var(--color-foreground)]">{dept.act_short}</dd>
             </div>
-            <div className="sm:col-span-2">
+            <div>
               <dt className="text-[var(--color-muted)] text-xs uppercase tracking-wide font-semibold mb-0.5">Escalation Body</dt>
               <dd className="text-[var(--color-foreground)]">{dept.escalation_body}</dd>
             </div>
