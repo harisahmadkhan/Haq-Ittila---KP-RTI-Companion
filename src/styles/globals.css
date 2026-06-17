@@ -11,34 +11,40 @@
 }
 
 @theme {
-  /* Nizam green scale */
-  --color-nizam_green-50:  #E5F7EE;
-  --color-nizam_green-100: #B6E7CB;
-  --color-nizam_green-200: #80D5A3;
-  --color-nizam_green-300: #55C885;
-  --color-nizam_green-400: #2BBA67;
-  --color-nizam_green-500: #008F3C;
-  --color-nizam_green-600: #007330;
-  --color-nizam_green-700: #005126;
-  --color-nizam_green-800: #01411C;
-  --color-nizam_green-900: #002812;
-  --color-nizam_green-950: #001a0c;
+  /* Base palette */
+  --color-background:        #0B2417;
+  --color-surface:           #102D1D;
+  --color-foreground:        #F2EDD4;
+  --color-muted:             #B8B49A;
+  --color-border:            rgba(201,162,39,0.35);
 
-  /* Semantic Nizam tokens — source: github.com/codeforpakistan/design-system tailwind.css */
-  --color-primary:           rgb(0 143 60);
-  --color-primary_accent:    rgb(182 231 203);
-  --color-secondary:         rgb(37 99 235);
-  --color-secondary_accent:  rgb(219 234 254);
-  --color-foreground:        rgb(24 24 27);
-  --color-background:        rgb(250 250 250);
-  --color-surface:           rgb(255 255 255);
-  --color-muted:             rgb(113 113 122);
-  --color-success:           rgb(0 143 60);
-  --color-success_accent:    rgb(182 231 203);
-  --color-danger:            rgb(239 68 68);
-  --color-danger_accent:     rgb(254 226 226);
-  --color-warning:           rgb(249 115 22);
-  --color-warning_accent:    rgb(255 237 213);
+  /* Primary accent (gold) */
+  --color-primary:           #C9A227;
+  --color-primary-hover:     #DDB84A;
+  --color-primary-accent:    rgba(201,162,39,0.12);
+
+  /* Semantic status */
+  --color-success:           #6B9C7D;
+  --color-success-accent:    rgba(107,156,125,0.15);
+  --color-danger:            #A6453A;
+  --color-danger-accent:     rgba(166,69,58,0.15);
+  --color-warning:           #C9A227;
+  --color-warning-accent:    rgba(201,162,39,0.15);
+  --color-unknown:           #8C8870;
+  --color-unknown-accent:    rgba(140,136,112,0.15);
+
+  /* Party colors — real flag colors */
+  --color-party-pti-from:    #C0392B;
+  --color-party-pti-to:      #2E7D4F;
+  --color-party-anp-from:    #8C2A2A;
+  --color-party-anp-to:      #C9622A;
+  --color-party-juif-from:   #2B2B28;
+  --color-party-juif-to:     #E8E4D0;
+  --color-party-pmln-from:   #1B5E3A;
+  --color-party-pmln-to:     #E8E4D0;
+  --color-party-ppp-from:    #1B5E3A;
+  --color-party-ppp-mid:     #A6303A;
+  --color-party-ppp-to:      #2B2B28;
 
   /* Font families */
   --font-sans:     "Open Sans", system-ui, sans-serif;
@@ -53,6 +59,17 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 { font-family: var(--font-serif); }
+
+/* Demo badge pulse animation */
+@keyframes badge-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
 }
 
 /* Print styles — hide everything except the RTI draft content */

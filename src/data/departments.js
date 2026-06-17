@@ -1,3 +1,5 @@
+const COMPLIANCE_NOTE = 'Illustrative rating — not based on verified RTI response data.';
+
 export const KP_DEPARTMENTS = {
   Education: {
     name: 'Elementary & Secondary Education Department',
@@ -11,6 +13,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconBook',
+    compliance: 'medium',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   Health: {
@@ -25,6 +30,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconCross',
+    compliance: 'medium',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   Infrastructure: {
@@ -39,6 +47,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconBridge',
+    compliance: 'low',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   Finance: {
@@ -53,6 +64,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconCoin',
+    compliance: 'unknown',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   Agriculture: {
@@ -67,6 +81,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconWheat',
+    compliance: 'medium',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   'Water & Sanitation': {
@@ -81,6 +98,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconDroplet',
+    compliance: 'low',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   Police: {
@@ -95,6 +115,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconShield',
+    compliance: 'low',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   'Local Government': {
@@ -109,6 +132,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconTownHall',
+    compliance: 'medium',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   Energy: {
@@ -123,6 +149,9 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconBolt',
+    compliance: 'unknown',
+    compliance_note: COMPLIANCE_NOTE,
   },
 
   Forestry: {
@@ -137,5 +166,8 @@ export const KP_DEPARTMENTS = {
     escalation_body: 'Khyber Pakhtunkhwa Information Commission',
     escalation_address: 'KP Information Commission, Peshawar',
     fee_per_page: 'Rs. 20',
+    icon: 'IconTree',
+    compliance: 'unknown',
+    compliance_note: COMPLIANCE_NOTE,
   },
 };

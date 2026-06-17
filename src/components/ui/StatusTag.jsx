@@ -1,9 +1,9 @@
 export default function StatusTag({ children, variant = 'success' }) {
   const variants = {
-    success: 'bg-success_accent text-success',
-    danger:  'bg-danger_accent text-danger',
-    warning: 'bg-warning_accent text-warning',
-    muted:   'bg-gray-100 text-muted',
+    success: 'bg-[var(--color-success-accent)] text-[var(--color-success)]',
+    danger:  'bg-[var(--color-danger-accent)] text-[var(--color-danger)]',
+    warning: 'bg-[var(--color-warning-accent)] text-[var(--color-warning)]',
+    muted:   'bg-[var(--color-unknown-accent)] text-[var(--color-muted)]',
   };
 
   return (

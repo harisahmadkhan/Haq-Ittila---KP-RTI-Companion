@@ -1,10 +1,13 @@
 import { useReducer } from 'react';
+import { KP_PARTIES } from '../data/parties.js';
 
 const initialState = {
   step: 1,
   query: '',
   manifestoChunks: [],
   researchSummary: '',
+  sources: [],
+  isDemo: false,
   department: null,
   routingReason: '',
   draftEn: '',
@@ -14,6 +17,7 @@ const initialState = {
   informationRequested: [],
   escalationNote: '',
   filedDate: null,
+  selectedParties: KP_PARTIES,
 };
 
 function reducer(state, action) {

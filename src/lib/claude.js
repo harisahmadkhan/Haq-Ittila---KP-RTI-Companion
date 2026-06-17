@@ -47,8 +47,20 @@ export async function callClaudeWithSearch({ system, userMessage, maxTokens = 20
   });
   if (!res.ok) throw new Error(`API error ${res.status}`);
   const data = await res.json();
-  return data.content
+
+  const text = data.content
     .filter(block => block.type === 'text')
     .map(block => block.text)
     .join('\n');
+
+  const sources = [];
+  for (const block of data.content) {
+    if (block.type === 'web_search_tool_result' && Array.isArray(block.content)) {
+      for (const r of block.content) {
+        if (r.url) sources.push({ title: r.title || r.url, url: r.url });
+      }
+    }
+  }
+
+  return { text, sources };
 }
