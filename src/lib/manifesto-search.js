@@ -17,7 +17,7 @@ function tokenMatchesKeyword(token, keyword) {
   return kl === token || kl.startsWith(token) || token.startsWith(kl);
 }
 
-export function findRelevantChunks(query, selectedParties = KP_PARTIES, maxChunks = 3) {
+export function findRelevantChunks(query, selectedParties = KP_PARTIES, maxChunks = 20) {
   const tokens = query
     .toLowerCase()
     .replace(/[–—\-]/g, ' ')
