@@ -284,16 +284,45 @@ export default function ResearchPanel({ query, selectedParties, onProceed, onRev
             >
               Manifesto Evidence
             </h3>
-            {chunks.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {chunks.map(c => <PartyChip key={c.id} chunk={c} />)}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <p className="font-sans text-sm text-[var(--color-foreground)] whitespace-pre-wrap leading-relaxed">
-                  {promiseText}
-                </p>
-              </div>
+            {chunks.length > 0 ? (() => {
+              // Group chunks by party, preserving selected-parties order
+              const grouped = {};
+              chunks.forEach(c => {
+                if (!grouped[c.party]) grouped[c.party] = [];
+                grouped[c.party].push(c);
+              });
+              const parties = [...new Set(chunks.map(c => c.party))];
+              return (
+                <div className="flex flex-col gap-6">
+                  {parties.map(party => {
+                    const info = PARTY_INFO[party];
+                    return (
+                      <div key={party}>
+                        {/* Party section header */}
+                        <div className="flex items-center gap-2 mb-3">
+                          <span
+                            className="inline-block w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ background: `linear-gradient(135deg, ${info?.colorFrom || '#555'}, ${info?.colorTo || '#888'})` }}
+                          />
+                          <span className="font-sans text-xs font-bold uppercase tracking-widest text-[var(--color-muted)]">
+                            {party} · {PARTY_INFO[party]?.fullName || party}
+                          </span>
+                          <span className="font-sans text-[10px] text-[var(--color-muted)] ml-auto">
+                            {grouped[party].length} reference{grouped[party].length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-2 pl-4 border-l-2" style={{ borderColor: info?.colorFrom || '#555' }}>
+                          {grouped[party].map(c => <PartyChip key={c.id} chunk={c} />)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })() : (
+              <p className="font-sans text-sm text-[var(--color-foreground)] whitespace-pre-wrap leading-relaxed">
+                {promiseText}
+              </p>
             )}
           </div>
         )}
