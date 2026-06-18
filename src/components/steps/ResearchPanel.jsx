@@ -213,7 +213,7 @@ export default function ResearchPanel({ query, selectedParties, onProceed, onRev
 
         <p className="font-sans text-[10px] uppercase tracking-widest text-[var(--color-primary)]/60 mb-1">Case File</p>
         <h2 className="font-serif font-bold text-xl text-[var(--color-foreground)] mb-1 leading-snug">
-          {query.length > 90 ? query.slice(0, 90) + '…' : query}
+          {query}
         </h2>
         <div className="flex flex-wrap items-center gap-3 mt-2">
           <span className="font-sans text-xs text-[var(--color-muted)]">
