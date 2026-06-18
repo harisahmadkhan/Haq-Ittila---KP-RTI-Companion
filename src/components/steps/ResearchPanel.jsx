@@ -26,6 +26,20 @@ function parseResearchSections(text) {
   };
 }
 
+// Derives the Promise stage text from live-filtered manifesto chunks.
+// Never falls back to pre-baked demo text — always reflects selected parties.
+function chunksToPromiseText(chunks, selectedParties) {
+  if (chunks.length === 0) {
+    const partyList = selectedParties && selectedParties.length > 0
+      ? selectedParties.join(', ')
+      : 'the selected parties';
+    return `No manifesto promises found for ${partyList} on this topic. The RTI request can still be filed — it does not require a prior promise to be valid.`;
+  }
+  return chunks
+    .map(c => `• ${c.party} (${c.topic}): "${c.text.slice(0, 200).trimEnd()}${c.text.length > 200 ? '…' : ''}"`)
+    .join('\n\n');
+}
+
 function countIssues(text) {
   if (!text) return 0;
   const bullets = (text.match(/[•\-\*]\s/g) || []).length;
@@ -163,7 +177,7 @@ export default function ResearchPanel({ query, selectedParties, onProceed, onRev
     }
     run();
     return () => { cancelled = true; };
-  }, [query]);
+  }, [query, selectedParties?.join(',')]);
 
   if (loading) {
     return (
@@ -195,8 +209,9 @@ export default function ResearchPanel({ query, selectedParties, onProceed, onRev
       {/* Stat summary row */}
       {hasContent && <StatSummary chunks={chunks} sections={sections} />}
 
-      {/* Research panels — connected vertical investigation narrative */}
-      {hasContent && (
+      {/* Research panels — connected vertical investigation narrative.
+          Show if demo has web/gap content OR if we need to show a no-match message */}
+      {(hasContent || isDemo) && (
         <div className="mb-6 relative">
           {/* Connector line running through the left icon column */}
           <div className="absolute left-[1.9rem] top-14 bottom-14 w-0.5 bg-[var(--color-primary)] opacity-30 pointer-events-none" />
@@ -213,7 +228,7 @@ export default function ResearchPanel({ query, selectedParties, onProceed, onRev
               </div>
               <div className="flex-1 border border-[var(--color-border)] rounded-xl p-5 mb-4" style={{ background: 'var(--color-success-accent)' }}>
                 <h3 className="font-serif font-semibold text-[var(--color-success)] text-sm uppercase tracking-wide mb-3">Promise</h3>
-                <p className="font-sans text-sm text-[var(--color-foreground)] whitespace-pre-wrap">{sections.promises || 'No specific promises found.'}</p>
+                <p className="font-sans text-sm text-[var(--color-foreground)] whitespace-pre-wrap">{chunksToPromiseText(chunks, selectedParties)}</p>
               </div>
             </div>
 
