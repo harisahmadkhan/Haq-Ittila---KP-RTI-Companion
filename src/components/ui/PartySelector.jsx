@@ -48,7 +48,8 @@ export default function PartySelector({ selectedParties, onPartiesChange }) {
       {/* Collapsed pill row */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-4 py-3 border border-[var(--color-border)] rounded-xl bg-[var(--color-primary-accent)] hover:border-[var(--color-primary)] transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 border border-[var(--color-border)] rounded-xl hover:border-[var(--color-primary)] transition-colors text-left"
+        style={{ background: 'rgba(0,172,72,0.08)' }}
       >
         <span className="font-sans text-xs text-[var(--color-muted)] font-semibold uppercase tracking-wide flex-shrink-0">Searching:</span>
         <div className="flex items-center gap-1 flex-1 flex-wrap">
@@ -72,10 +73,13 @@ export default function PartySelector({ selectedParties, onPartiesChange }) {
         <span className="font-sans text-xs text-[var(--color-primary)] font-semibold flex-shrink-0">Customize</span>
       </button>
 
-      {/* Expanded cards */}
+      {/* Expanded list */}
       {open && (
-        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-          {KP_PARTIES.map(party => {
+        <div
+          className="mt-2 rounded-xl border border-[var(--color-border)] overflow-hidden"
+          style={{ background: 'rgba(0,0,0,0.25)' }}
+        >
+          {KP_PARTIES.map((party, i) => {
             const info = PARTY_INFO[party];
             const checked = selectedParties.includes(party);
             const isGoverning = party === KP_GOVERNING_PARTY;
@@ -85,39 +89,44 @@ export default function PartySelector({ selectedParties, onPartiesChange }) {
               <button
                 key={party}
                 onClick={() => toggle(party)}
-                className={`relative text-left border rounded-xl p-4 transition-colors
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors
+                  ${i > 0 ? 'border-t border-[var(--color-border)]' : ''}
                   ${checked
-                    ? 'border-[var(--color-primary)] bg-[var(--color-primary-accent)]'
-                    : 'border-[var(--color-border)] bg-transparent hover:border-[var(--color-primary)]/50'
+                    ? 'bg-[var(--color-primary)]/10'
+                    : 'hover:bg-white/5'
                   }`}
               >
-                {/* Checkbox */}
-                <div className={`absolute top-3 right-3 w-4 h-4 rounded border-2 flex items-center justify-center
-                  ${checked ? 'border-[var(--color-primary)] bg-[var(--color-primary)]' : 'border-[var(--color-muted)]'}`}
-                >
-                  {checked && <span className="text-[var(--color-background)] text-[9px] font-bold leading-none">✓</span>}
-                </div>
+                {/* Avatar */}
+                <PartyAvatar party={party} />
 
-                <div className="flex items-center gap-2 mb-2">
-                  <PartyAvatar party={party} />
-                  <div className="min-w-0">
-                    <p className="font-sans text-xs font-bold text-[var(--color-foreground)] truncate">{party}</p>
+                {/* Name + full name */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-sans text-sm font-bold text-[var(--color-foreground)]">{party}</span>
                     {isGoverning && (
-                      <span className="text-[10px] font-semibold font-sans px-1.5 py-0.5 rounded-full bg-[var(--color-warning-accent)] text-[var(--color-warning)]">
+                      <span className="text-[9px] font-semibold font-sans px-1.5 py-0.5 rounded-full"
+                        style={{ background: 'rgba(245,158,11,0.15)', color: 'var(--color-warning)' }}>
                         Governing
                       </span>
                     )}
                   </div>
+                  <p className="font-sans text-xs text-[var(--color-muted)] leading-snug mt-0.5 truncate">
+                    {info.fullName}
+                  </p>
                 </div>
 
-                <p className="font-sans text-xs text-[var(--color-muted)] leading-snug mb-2 line-clamp-2">
-                  {info.fullName}
-                </p>
+                {/* Stats */}
+                <div className="hidden sm:flex items-center gap-2 text-[10px] text-[var(--color-muted)] font-sans flex-shrink-0">
+                  <span>{stats.chunks} refs</span>
+                  <span>·</span>
+                  <span>{stats.topics} topics</span>
+                </div>
 
-                <div className="flex items-center gap-3 text-[10px] text-[var(--color-muted)] font-sans">
-                  <span>📄 {stats.chunks}</span>
-                  <span>🎯 {stats.topics} topics</span>
-                  <span>📅 2024</span>
+                {/* Checkbox */}
+                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
+                  ${checked ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'border-[var(--color-muted)]'}`}
+                >
+                  {checked && <span className="text-white text-[10px] font-bold leading-none">✓</span>}
                 </div>
               </button>
             );
