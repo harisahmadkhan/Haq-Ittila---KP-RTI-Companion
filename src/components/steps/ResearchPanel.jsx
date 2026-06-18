@@ -78,8 +78,88 @@ function PartyChip({ chunk }) {
         <span className="text-xs font-sans text-[var(--color-muted)] ml-auto">{chunk.source}</span>
       </div>
       <p className="font-sans text-sm text-[var(--color-foreground)] leading-relaxed">
-        "{chunk.text.slice(0, 160).trimEnd()}{chunk.text.length > 160 ? '…' : ''}"
+        "{chunk.text}"
       </p>
+    </div>
+  );
+}
+
+function EvidencePane({ chunks, selectedParties, promiseText }) {
+  const parties = [...new Set(chunks.map(c => c.party))];
+  const [activeParty, setActiveParty] = useState(parties[0] || null);
+
+  if (chunks.length === 0) {
+    return (
+      <p className="font-sans text-sm text-[var(--color-foreground)] whitespace-pre-wrap leading-relaxed">
+        {promiseText}
+      </p>
+    );
+  }
+
+  // Group by party
+  const grouped = {};
+  chunks.forEach(c => {
+    if (!grouped[c.party]) grouped[c.party] = [];
+    grouped[c.party].push(c);
+  });
+
+  const current = grouped[activeParty] || [];
+  const activeInfo = PARTY_INFO[activeParty];
+
+  return (
+    <div>
+      {/* Party tab pills */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {parties.map(party => {
+          const info = PARTY_INFO[party];
+          const isActive = activeParty === party;
+          return (
+            <button
+              key={party}
+              onClick={() => setActiveParty(party)}
+              title={info?.fullName}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-sans text-xs font-semibold transition-all border"
+              style={isActive ? {
+                background: `linear-gradient(135deg, ${info?.colorFrom || '#555'}, ${info?.colorTo || '#888'})`,
+                borderColor: 'transparent',
+                color: '#fff',
+              } : {
+                background: 'transparent',
+                borderColor: info?.colorFrom || '#555',
+                color: 'var(--color-muted)',
+              }}
+            >
+              {party}
+              <span
+                className="text-[10px] px-1 rounded-full font-bold"
+                style={isActive
+                  ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
+                  : { background: 'rgba(255,255,255,0.08)', color: 'var(--color-muted)' }
+                }
+              >
+                {grouped[party].length}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Party header */}
+      {activeInfo && (
+        <div className="flex items-center gap-2 mb-3">
+          <span className="font-sans text-xs text-[var(--color-muted)]">{activeInfo.fullName}</span>
+          {PARTY_TENURE[activeParty] && (
+            <span className="font-sans text-[10px] px-2 py-0.5 rounded-full border border-[var(--color-border)] text-[var(--color-muted)]">
+              {PARTY_TENURE[activeParty]}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Chunks for active party */}
+      <div className="flex flex-col gap-3">
+        {current.map(c => <PartyChip key={c.id} chunk={c} />)}
+      </div>
     </div>
   );
 }
@@ -277,54 +357,7 @@ export default function ResearchPanel({ query, selectedParties, onProceed, onRev
         style={{ background: TAB_BG[activeTab] || 'var(--color-surface)' }}
       >
         {activeTab === 'evidence' && (
-          <div>
-            <h3
-              className="font-serif font-semibold text-sm uppercase tracking-wide mb-4"
-              style={{ color: TAB_ACCENT.evidence }}
-            >
-              Manifesto Evidence
-            </h3>
-            {chunks.length > 0 ? (() => {
-              // Group chunks by party, preserving selected-parties order
-              const grouped = {};
-              chunks.forEach(c => {
-                if (!grouped[c.party]) grouped[c.party] = [];
-                grouped[c.party].push(c);
-              });
-              const parties = [...new Set(chunks.map(c => c.party))];
-              return (
-                <div className="flex flex-col gap-6">
-                  {parties.map(party => {
-                    const info = PARTY_INFO[party];
-                    return (
-                      <div key={party}>
-                        {/* Party section header */}
-                        <div className="flex items-center gap-2 mb-3">
-                          <span
-                            className="inline-block w-2 h-2 rounded-full flex-shrink-0"
-                            style={{ background: `linear-gradient(135deg, ${info?.colorFrom || '#555'}, ${info?.colorTo || '#888'})` }}
-                          />
-                          <span className="font-sans text-xs font-bold uppercase tracking-widest text-[var(--color-muted)]">
-                            {party} · {PARTY_INFO[party]?.fullName || party}
-                          </span>
-                          <span className="font-sans text-[10px] text-[var(--color-muted)] ml-auto">
-                            {grouped[party].length} reference{grouped[party].length !== 1 ? 's' : ''}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-2 pl-4 border-l-2" style={{ borderColor: info?.colorFrom || '#555' }}>
-                          {grouped[party].map(c => <PartyChip key={c.id} chunk={c} />)}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })() : (
-              <p className="font-sans text-sm text-[var(--color-foreground)] whitespace-pre-wrap leading-relaxed">
-                {promiseText}
-              </p>
-            )}
-          </div>
+          <EvidencePane chunks={chunks} selectedParties={selectedParties} promiseText={promiseText} />
         )}
 
         {activeTab === 'findings' && (
