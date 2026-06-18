@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Button from '../ui/Button.jsx';
-import Card from '../ui/Card.jsx';
 import PartySelector from '../ui/PartySelector.jsx';
 import IconBook from '../icons/IconBook.jsx';
 import IconCross from '../icons/IconCross.jsx';
@@ -119,54 +118,53 @@ const EXAMPLE_CATEGORIES = [
   },
 ];
 
-function CategoryCard({ cat, onSelect }) {
-  const [open, setOpen] = useState(false);
-  const CatIcon = ICON_MAP[cat.label];
+// Right column: flat list of categories, clicking a category expands its queries inline
+function CategoryBrowser({ onSelect }) {
+  const [activeCat, setActiveCat] = useState(EXAMPLE_CATEGORIES[0].label);
+
+  const active = EXAMPLE_CATEGORIES.find(c => c.label === activeCat);
+  const CatIcon = ICON_MAP[activeCat];
 
   return (
-    <div
-      className="relative rounded-xl border border-[var(--color-border)] overflow-hidden hover:border-[var(--color-primary)] transition-colors min-h-[11rem]"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)}
-      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}
-    >
-      {/* Underlying header + query buttons — always rendered for accessibility */}
-      <div className="px-4 py-2.5 border-b border-[var(--color-border)] flex items-center gap-2">
-        {CatIcon && <CatIcon className="w-3.5 h-3.5 text-[var(--color-primary)]" />}
-        <p className="text-xs font-sans font-bold text-[var(--color-primary)] uppercase tracking-wider">{cat.label}</p>
+    <div className="flex flex-col h-full border border-[var(--color-border)] rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
+      {/* Category tab strip */}
+      <div className="flex flex-wrap gap-1 p-3 border-b border-[var(--color-border)]">
+        {EXAMPLE_CATEGORIES.map(cat => {
+          const Icon = ICON_MAP[cat.label];
+          const isActive = activeCat === cat.label;
+          return (
+            <button
+              key={cat.label}
+              onClick={() => setActiveCat(cat.label)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-sans font-semibold transition-colors ${
+                isActive
+                  ? 'bg-[var(--color-primary)] text-[var(--color-background)]'
+                  : 'text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-white/5'
+              }`}
+            >
+              {Icon && <Icon className="w-3 h-3 flex-shrink-0" />}
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
-      <div className="p-3 flex flex-col gap-2">
-        {cat.queries.map(q => (
+
+      {/* Query list for active category */}
+      <div className="flex-1 p-3 flex flex-col gap-2 overflow-y-auto">
+        {active?.queries.map(q => (
           <button
             key={q}
             onClick={() => onSelect(q)}
-            className="w-full text-left text-xs font-sans text-[var(--color-muted)] bg-[var(--color-primary-accent)] rounded-lg px-3 py-2 hover:bg-[var(--color-primary)] hover:text-[var(--color-background)] transition-colors leading-snug"
+            className="w-full text-left text-sm font-sans text-[var(--color-muted)] rounded-lg px-3 py-2.5 border border-transparent hover:border-[var(--color-primary)] hover:text-[var(--color-foreground)] hover:bg-white/5 transition-all leading-snug"
           >
             {q}
           </button>
         ))}
       </div>
 
-      {/* Overlay: covers card by default; fades away on hover / focus-within / tap */}
-      <div
-        aria-hidden={open}
-        onClick={() => setOpen(true)}
-        className="absolute inset-0 flex flex-col items-center justify-center gap-3 transition-opacity duration-[220ms] ease-out select-none"
-        style={{
-          background: 'linear-gradient(160deg, #0B2417 0%, #061610 100%)',
-          opacity: open ? 0 : 1,
-          pointerEvents: open ? 'none' : 'auto',
-        }}
-      >
-        {CatIcon && (
-          <CatIcon className="w-9 h-9 text-[var(--color-primary)]" />
-        )}
-        <p className="font-serif font-semibold text-[var(--color-primary)] text-base tracking-wide text-center px-4">
-          {cat.label}
-        </p>
-        <p className="font-sans text-[var(--color-muted)] text-[10px] uppercase tracking-widest opacity-60">
-          {cat.queries.length} questions
+      <div className="px-3 py-2 border-t border-[var(--color-border)]">
+        <p className="font-sans text-[10px] text-[var(--color-muted)] uppercase tracking-wider">
+          {active?.queries.length} example questions · click to prefill
         </p>
       </div>
     </div>
@@ -181,69 +179,67 @@ export default function QueryInput({ selectedParties, onPartiesChange, onSubmit 
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Merged hero + input panel */}
-      <div
-        className="rounded-2xl shadow-xl relative overflow-hidden mb-8"
-        style={{ background: 'linear-gradient(135deg, #0B2417 0%, #0f2e1e 60%, #061610 100%)' }}
-      >
-        {/* Gold corner brackets */}
-        <span className="absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 border-[var(--color-primary)] rounded-tl-sm opacity-70 pointer-events-none" />
-        <span className="absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 border-[var(--color-primary)] rounded-tr-sm opacity-70 pointer-events-none" />
-        <span className="absolute bottom-4 left-4 w-7 h-7 border-b-2 border-l-2 border-[var(--color-primary)] rounded-bl-sm opacity-70 pointer-events-none" />
-        <span className="absolute bottom-4 right-4 w-7 h-7 border-b-2 border-r-2 border-[var(--color-primary)] rounded-br-sm opacity-70 pointer-events-none" />
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-        <div className="px-8 pt-10 pb-4 text-center">
-          <p className="font-naskh text-[var(--color-primary)]/70 text-lg mb-1">حق اطلاع</p>
-          <h2 className="font-serif font-bold text-2xl md:text-3xl text-[var(--color-foreground)] mb-3">
-            What do you want to know from the KP government?
-          </h2>
-          <p className="text-[var(--color-muted)] font-sans text-sm max-w-xl mx-auto">
-            Describe your question in plain language — we'll research manifestos and news, identify the right department, and draft a legally sound RTI request in English and Urdu.
-          </p>
-        </div>
+        {/* Left column — dark input panel */}
+        <div
+          className="rounded-2xl shadow-xl relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #0B2417 0%, #0f2e1e 60%, #061610 100%)' }}
+        >
+          {/* Gold corner brackets */}
+          <span className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[var(--color-primary)] rounded-tl-sm opacity-60 pointer-events-none" />
+          <span className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[var(--color-primary)] rounded-tr-sm opacity-60 pointer-events-none" />
+          <span className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[var(--color-primary)] rounded-bl-sm opacity-60 pointer-events-none" />
+          <span className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[var(--color-primary)] rounded-br-sm opacity-60 pointer-events-none" />
 
-        {/* Party selector inside the panel */}
-        <div className="px-8 pt-2 pb-4">
-          <PartySelector selectedParties={selectedParties} onPartiesChange={onPartiesChange} />
-        </div>
-
-        {/* Glass-style textarea directly on the panel */}
-        <div className="px-8 pb-8">
-          <textarea
-            className="w-full h-32 font-sans text-[var(--color-foreground)] rounded-lg border border-[var(--color-primary)] p-4 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] placeholder:text-[var(--color-muted)]/60"
-            style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(4px)' }}
-            placeholder="e.g. Has the government built the promised schools in Swat? / کیا حکومت نے سوات میں وعدہ کیے گئے اسکول تعمیر کیے؟"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            maxLength={500}
-          />
-          <div className="flex items-center justify-between mt-2 mb-4">
-            <span className="text-xs text-[var(--color-muted)] font-sans">{query.length}/500</span>
-            {query.length > 0 && query.length < 20 && (
-              <span className="text-xs text-[var(--color-warning)] font-sans">Please enter at least 20 characters</span>
-            )}
+          <div className="px-7 pt-8 pb-4">
+            <p className="font-naskh text-[var(--color-primary)]/70 text-lg mb-1">حق اطلاع</p>
+            <h2 className="font-serif font-bold text-2xl md:text-3xl text-[var(--color-foreground)] mb-2">
+              What do you want to know from the KP government?
+            </h2>
+            <p className="text-[var(--color-muted)] font-sans text-sm leading-relaxed">
+              Ask in plain language — Urdu or English. We'll research party manifestos, find the right department, and draft a legally sound RTI.
+            </p>
           </div>
-          <Button
-            onClick={handleSubmit}
-            disabled={query.trim().length < 20}
-            className="w-full justify-center"
-          >
-            Research this →
-          </Button>
-        </div>
-      </div>
 
-      {/* Category grid */}
-      <div className="mb-3">
-        <p className="text-xs text-[var(--color-muted)] font-sans mb-4 uppercase tracking-wider font-semibold text-center">
-          Or pick an example question by category
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {EXAMPLE_CATEGORIES.map(cat => (
-            <CategoryCard key={cat.label} cat={cat} onSelect={setQuery} />
-          ))}
+          <div className="px-7 pb-4">
+            <PartySelector selectedParties={selectedParties} onPartiesChange={onPartiesChange} />
+          </div>
+
+          <div className="px-7 pb-7">
+            <textarea
+              className="w-full h-36 font-sans text-[var(--color-foreground)] rounded-lg border border-[var(--color-primary)] p-4 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] placeholder:text-[var(--color-muted)]/50 leading-relaxed"
+              style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(4px)' }}
+              placeholder="e.g. Has the government built the promised schools in Swat? / کیا حکومت نے سوات میں وعدہ کیے گئے اسکول تعمیر کیے؟"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              maxLength={500}
+            />
+            <div className="flex items-center justify-between mt-2 mb-4">
+              <span className="text-xs text-[var(--color-muted)] font-sans">{query.length}/500</span>
+              {query.length > 0 && query.length < 20 && (
+                <span className="text-xs text-[var(--color-warning)] font-sans">At least 20 characters needed</span>
+              )}
+            </div>
+            <Button
+              onClick={handleSubmit}
+              disabled={query.trim().length < 20}
+              className="w-full justify-center"
+            >
+              Research this →
+            </Button>
+          </div>
         </div>
+
+        {/* Right column — category browser */}
+        <div className="flex flex-col gap-2">
+          <p className="text-xs text-[var(--color-muted)] font-sans uppercase tracking-wider font-semibold px-1">
+            Browse example questions by category
+          </p>
+          <CategoryBrowser onSelect={q => setQuery(q)} />
+        </div>
+
       </div>
     </div>
   );
